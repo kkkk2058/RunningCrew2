@@ -1,0 +1,31 @@
+<!-- res/layout/activity_main_menu.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FAFAFA">
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2인용 게임"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="40dp" />
+
+    <Button
+        android:id="@+id/btnEchoMode"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="1인용 Echo 모드" />
+
+    <Button
+        android:id="@+id/btnBattleMode"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="2인용 Battle 모드"
+        android:layout_marginTop="20dp" />
+</LinearLayout>

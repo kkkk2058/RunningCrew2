@@ -1,0 +1,32 @@
+<!-- res/layout/activity_game_over.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#F8BBD0">
+
+    <TextView
+        android:id="@+id/gameOverText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="게임 종료"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="점수: 0"
+        android:textSize="24sp"
+        android:layout_marginBottom="30dp" />
+
+    <Button
+        android:id="@+id/btnReturnToMenu"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="시작화면으로 돌아가기" />
+</LinearLayout>
