@@ -1,78 +1,150 @@
 package com.example.runningcrew1;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
-import android.os.Handler;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.runningcrew1.MonsterModel;
-
 public class GameActivity extends AppCompatActivity {
-
+    private PlayerModel playerModel;
+    private PlayerView playerView;
     private MonsterModel monsterModel;
     private MonsterView monsterView;
-    private Handler handler = new Handler();
-    private Runnable gameLoopRunnable;
-    private boolean isPaused = false;
+    private FrameLayout gameLayout;
+    private Button pauseButton, btnLeft, btnRight, btnJump;
+
+    private int screenWidth;
+    private int screenHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
 
-        // 몬스터 초기화
-        monsterModel = new MonsterModel(500, 500, 5, 7);
+        // 화면 크기 가져오기
+        Point screenSize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(screenSize);
+        screenWidth = screenSize.x;
+        screenHeight = screenSize.y;
+
+        // 플레이어와 몬스터 모델 생성
+        playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
+        monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 5, 5);
+
+        // 플레이어와 몬스터 뷰 생성
+        playerView = new PlayerView(this, playerModel);
         monsterView = new MonsterView(this, monsterModel);
 
-        // gameView에 몬스터 추가
-        FrameLayout gameLayout = findViewById(R.id.gameView);
+        // FrameLayout으로 게임 화면 구성
+        gameLayout = new FrameLayout(this);
         gameLayout.addView(monsterView);
+        gameLayout.addView(playerView);
 
+        // 버튼 생성 및 레이아웃 설정
+        setupButtons();
 
-        // 일시정지 버튼 설정
-        Button btnPause = findViewById(R.id.btnPause);
-        btnPause.setOnClickListener(v -> {
-            isPaused = true;
-            handler.removeCallbacks(gameLoopRunnable); // 게임 루프 일시정지
-            Intent intent = new Intent(GameActivity.this, PauseActivity.class);
-            startActivity(intent);
-        });
+        // 일시정지 버튼 추가
+        setupPauseButton();
 
-        // 게임 루프 초기화
-        gameLoopRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!isPaused) {
-                    // 몬스터 위치 업데이트 및 뷰 갱신
+        setContentView(gameLayout);
+
+        // 게임 루프 시작
+        startGameLoop();
+    }
+
+    private void setupButtons() {
+        // 버튼 생성
+        btnLeft = new Button(this);
+        btnLeft.setText("←");
+        btnRight = new Button(this);
+        btnRight.setText("→");
+        btnJump = new Button(this);
+        btnJump.setText("Jump");
+
+        // 버튼 클릭 이벤트 설정
+        btnLeft.setOnClickListener(v -> playerModel.moveLeft());
+        btnRight.setOnClickListener(v -> playerModel.moveRight());
+        btnJump.setOnClickListener(v -> playerModel.jump());
+
+        // 버튼 배치 설정
+        FrameLayout.LayoutParams leftParams = new FrameLayout.LayoutParams(
+                200, 200, Gravity.BOTTOM | Gravity.START
+        );
+        leftParams.leftMargin = screenWidth / 2 - 300;
+        leftParams.bottomMargin = 50;
+
+        FrameLayout.LayoutParams jumpParams = new FrameLayout.LayoutParams(
+                200, 200, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL
+        );
+        jumpParams.bottomMargin = 50;
+
+        FrameLayout.LayoutParams rightParams = new FrameLayout.LayoutParams(
+                200, 200, Gravity.BOTTOM | Gravity.END
+        );
+        rightParams.rightMargin = screenWidth / 2 - 300;
+        rightParams.bottomMargin = 50;
+
+        // 버튼 추가
+        gameLayout.addView(btnLeft, leftParams);
+        gameLayout.addView(btnJump, jumpParams);
+        gameLayout.addView(btnRight, rightParams);
+    }
+
+    private void setupPauseButton() {
+        pauseButton = new Button(this);
+        pauseButton.setText("Pause");
+        pauseButton.setOnClickListener(v -> pauseGame());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.topMargin = 50;
+        params.leftMargin = 50;
+        gameLayout.addView(pauseButton, params);
+    }
+
+    private void startGameLoop() {
+        new Thread(() -> {
+            while (playerModel.isAlive()) {
+                runOnUiThread(() -> {
+                    // 모델 업데이트
+                    playerModel.updatePosition();
                     monsterModel.updatePosition();
-                    monsterView.invalidate();
+
+                    // 충돌 체크
+                    if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
+                        playerModel.setAlive(false);
+                        endGame();
+                    }
+
+                    // 점수 증가 로직
+                    playerModel.increaseScore(1);
+
+                    // 화면 업데이트
+                    playerView.invalidate();
+                });
+
+                try {
+                    Thread.sleep(16); // 약 60FPS
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                // 루프 반복 (60FPS로 호출)
-                handler.postDelayed(this, 16);
             }
-        };
+        }).start();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        isPaused = false; // 액티비티가 다시 활성화되면 게임 루프 재개
-        handler.post(gameLoopRunnable); // 게임 루프 다시 시작
+    private void pauseGame() {
+        Intent intent = new Intent(GameActivity.this, PauseActivity.class);
+        startActivity(intent);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        isPaused = true; // 액티비티가 일시정지되면 게임 루프 일시정지
-        handler.removeCallbacks(gameLoopRunnable); // 루프 중지
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        handler.removeCallbacks(gameLoopRunnable); // 루프 완전 종료
+    private void endGame() {
+        Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
+        intent.putExtra("score", playerModel.getScore());
+        startActivity(intent);
+        finish();
     }
 }
