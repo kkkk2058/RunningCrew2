@@ -8,8 +8,7 @@ import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.runningcrew1.models.MonsterModel;
-import com.example.runningcrew1.views.MonsterView;
+import com.example.runningcrew1.MonsterModel;
 
 public class GameActivity extends AppCompatActivity {
 

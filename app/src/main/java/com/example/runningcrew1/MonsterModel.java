@@ -1,4 +1,4 @@
-package com.example.runningcrew1.models;
+package com.example.runningcrew1;
 
 public class MonsterModel {
     private float x, y;  // 몬스터의 위치
