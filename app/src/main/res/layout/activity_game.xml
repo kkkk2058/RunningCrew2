@@ -1,13 +1,31 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!-- 게임 그래픽 영역 -->
-    <FrameLayout
-        android:id="@+id/gameView"
+    <LinearLayout
+        android:id="@+id/LinearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E0F7FA" />
+        android:background="#E0F7FA"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/gameView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="20">
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/groundView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="#4CAF50" />
+    </LinearLayout>
 
     <!-- 일시정지 버튼 -->
     <Button

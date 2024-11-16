@@ -1,4 +1,4 @@
-package com.example.runningcrew1.views;
+package com.example.runningcrew1;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.view.View;
 
-import com.example.runningcrew1.R;
 import com.example.runningcrew1.models.MonsterModel;
 
 public class MonsterView extends View {

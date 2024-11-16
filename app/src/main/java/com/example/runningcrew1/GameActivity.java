@@ -32,6 +32,7 @@ public class GameActivity extends AppCompatActivity {
         FrameLayout gameLayout = findViewById(R.id.gameView);
         gameLayout.addView(monsterView);
 
+
         // 일시정지 버튼 설정
         Button btnPause = findViewById(R.id.btnPause);
         btnPause.setOnClickListener(v -> {
