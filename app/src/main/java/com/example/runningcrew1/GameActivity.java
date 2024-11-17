@@ -6,9 +6,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MotionEvent;
-import android.view.Gravity;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,11 +18,18 @@ public class GameActivity extends AppCompatActivity {
     private PlayerView playerView;
     private MonsterModel monsterModel;
     private MonsterView monsterView;
-    private FrameLayout gameLayout;
-    private Button pauseButton, btnLeft, btnRight, btnJump;
+
+    private FrameLayout gameView;
+    private ImageView groundView;
+    private LinearLayout controllerLayout;
+
+    private Button btnLeft, btnRight, btnJump, btnPause;
 
     private int screenWidth;
     private int screenHeight;
+
+    private Handler gameHandler = new Handler(Looper.getMainLooper());
+    private boolean isGamePaused = false;
 
     private Handler moveHandler = new Handler(Looper.getMainLooper());
     private boolean isMovingLeft = false;
@@ -31,11 +39,24 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // XML 레이아웃 설정
+        setContentView(R.layout.activity_game);
+
         // 화면 크기 가져오기
         Point screenSize = new Point();
         getWindowManager().getDefaultDisplay().getSize(screenSize);
         screenWidth = screenSize.x;
         screenHeight = screenSize.y;
+
+        // XML 뷰 찾기
+        gameView = findViewById(R.id.gameView);
+        groundView = findViewById(R.id.groundView);
+        controllerLayout = findViewById(R.id.controllerLayout);
+
+        btnLeft = findViewById(R.id.btnLeft);
+        btnRight = findViewById(R.id.btnRight);
+        btnJump = findViewById(R.id.btnJump);
+        btnPause = findViewById(R.id.btnPause);
 
         // 플레이어와 몬스터 모델 생성
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
@@ -45,74 +66,27 @@ public class GameActivity extends AppCompatActivity {
         playerView = new PlayerView(this, playerModel);
         monsterView = new MonsterView(this, monsterModel);
 
-        // FrameLayout으로 게임 화면 구성
-        gameLayout = new FrameLayout(this);
-        gameLayout.addView(monsterView);
-        gameLayout.addView(playerView);
+        // Pause 버튼 클릭 이벤트 설정
+        btnPause.setOnClickListener(v -> pauseGame());
 
-        // 버튼 생성 및 레이아웃 설정
-        setupButtons();
+        // 게임 화면에 뷰 추가
+        gameView.addView(monsterView);
+        gameView.addView(playerView);
 
-        // 일시정지 버튼 추가
-        setupPauseButton();
-
-        setContentView(gameLayout);
+        // 버튼 동작 설정
+        setupButtonListeners();
 
         // 게임 루프 시작
         startGameLoop();
     }
 
-    private void setupButtons() {
-        // 버튼 생성
-        btnLeft = new Button(this);
-        btnLeft.setText("←");
-        btnRight = new Button(this);
-        btnRight.setText("→");
-        btnJump = new Button(this);
-        btnJump.setText("Jump");
-
+    private void setupButtonListeners() {
         // 좌우 이동 버튼 터치 이벤트 설정
         btnLeft.setOnTouchListener((v, event) -> handleMove(event, true));
         btnRight.setOnTouchListener((v, event) -> handleMove(event, false));
 
         // 점프 버튼 클릭 이벤트 설정
         btnJump.setOnClickListener(v -> playerModel.jump());
-
-        // 버튼 배치 설정
-        FrameLayout.LayoutParams leftParams = new FrameLayout.LayoutParams(
-                200, 200, Gravity.BOTTOM | Gravity.START
-        );
-        leftParams.leftMargin = screenWidth / 2 - 300;
-        leftParams.bottomMargin = 50;
-
-        FrameLayout.LayoutParams jumpParams = new FrameLayout.LayoutParams(
-                200, 200, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL
-        );
-        jumpParams.bottomMargin = 50;
-
-        FrameLayout.LayoutParams rightParams = new FrameLayout.LayoutParams(
-                200, 200, Gravity.BOTTOM | Gravity.END
-        );
-        rightParams.rightMargin = screenWidth / 2 - 300;
-        rightParams.bottomMargin = 50;
-
-        // 버튼 추가
-        gameLayout.addView(btnLeft, leftParams);
-        gameLayout.addView(btnJump, jumpParams);
-        gameLayout.addView(btnRight, rightParams);
-    }
-
-    private void setupPauseButton() {
-        pauseButton = new Button(this);
-        pauseButton.setText("Pause");
-        pauseButton.setOnClickListener(v -> pauseGame());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.topMargin = 50;
-        params.leftMargin = 50;
-        gameLayout.addView(pauseButton, params);
     }
 
     private void startGameLoop() {
@@ -146,6 +120,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void pauseGame() {
+        isGamePaused = true;
         Intent intent = new Intent(GameActivity.this, PauseActivity.class);
         startActivity(intent);
     }
