@@ -16,8 +16,8 @@ public class ItemView extends View {
 
 
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.itembox);
-        int desiredWidth = 100; // 원하는 너비
-        int desiredHeight = 100; // 원하는 높이
+        int desiredWidth = 200; // 원하는 너비
+        int desiredHeight = 200; // 원하는 높이
         this.mapBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
     }
 

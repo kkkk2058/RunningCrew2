@@ -2,11 +2,11 @@ package com.example.runningcrew1;
 
 public class MapModel {
 
-    private float displayWidth =0;
-    private float displayHeight =0;
+    private int displayWidth =0;
+    private int displayHeight =0;
 
-    private float terrainX = 0;
-    private float terrainY = 0;
+    private int terrainX = 0;
+    private int terrainY = 0;
 
 
     public MapModel(int displayWidth, int randNum){
@@ -21,10 +21,10 @@ public class MapModel {
         this.terrainX -= 1;
     }
 
-    public float getTerrainX(){
+    public int getTerrainX(){
         return this.terrainX;
     }
-    public float getTerrainY(){
+    public int getTerrainY(){
         return this.terrainY;
     }
 }

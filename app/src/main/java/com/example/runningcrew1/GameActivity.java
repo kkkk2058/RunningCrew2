@@ -68,14 +68,16 @@ public class GameActivity extends AppCompatActivity {
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
         monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 5, 5);
         Random random = new Random();
-        int randNum = random.nextInt(screenHeight-50);
-        mapModel = new MapModel(screenWidth, randNum);
-        itemModel = new ItemModel(screenWidth,screenHeight,randNum);
+        int randHeight = random.nextInt(screenHeight-50);
+        mapModel = new MapModel(screenWidth, randHeight);
+        itemModel = new ItemModel(screenWidth,screenHeight,randHeight);
 
         // 플레이어와 몬스터 맵 뷰 생성
         playerView = new PlayerView(this, playerModel);
         monsterView = new MonsterView(this, monsterModel);
-        mapView = new MapView(this, mapModel);
+        // 1*1지형을 가로로 몇개 생성해낼지 받는 랜덤(5칸까지)
+        int randNum = random.nextInt(5)+1;
+        mapView = new MapView(this, mapModel, randNum);
         itemView = new ItemView(this, itemModel);
 
         // Pause 버튼 클릭 이벤트 설정

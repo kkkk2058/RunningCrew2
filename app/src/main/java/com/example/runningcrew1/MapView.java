@@ -9,10 +9,12 @@ import android.view.View;
 public class MapView extends View {
     private MapModel mapModel;
     private Bitmap mapBitmap;
+    private int randNum;
 
-    public MapView(Context context, MapModel model) {
+    public MapView(Context context, MapModel model, int randNum) {
         super(context);
         this.mapModel = model;
+        this.randNum = randNum;
 
 
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
@@ -26,9 +28,12 @@ public class MapView extends View {
         super.onDraw(canvas);
 
         if (mapBitmap != null) {
-            float x = mapModel.getTerrainX() - (mapBitmap.getWidth() / 2);
-            float y = mapModel.getTerrainY() - (mapBitmap.getHeight() / 2);
-            canvas.drawBitmap(mapBitmap, x, y, null);
+            for (int i = 0; i < randNum; i++) {
+                float x = mapModel.getTerrainX() - (mapBitmap.getWidth() / 2) + (i * mapBitmap.getWidth());
+                float y = mapModel.getTerrainY() - (mapBitmap.getHeight() / 2);
+
+                canvas.drawBitmap(mapBitmap, x, y, null);
+            }
         }
         invalidate();
     }
