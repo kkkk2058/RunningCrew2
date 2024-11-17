@@ -1,8 +1,5 @@
 package com.example.runningcrew1;
 
-
-import java.util.Random;
-
 public class MapModel {
 
     private float displayWidth =0;
@@ -12,21 +9,16 @@ public class MapModel {
     private float terrainY = 0;
 
 
-    public MapModel(float displayWidth, float displayHeight){
+    public MapModel(int displayWidth, int randNum){
 
         this.displayWidth = displayWidth;
-        this.displayHeight = displayHeight;
 
         this.terrainX = displayWidth;
-
-        Random random = new Random();
-        this.terrainY = random.nextInt((int)this.displayHeight-50);
-
+        this.terrainY = randNum;
     }
 
-    public void updateposition(){
+    public void updatePosition(){
         this.terrainX -= 1;
-
     }
 
     public float getTerrainX(){
@@ -36,3 +28,4 @@ public class MapModel {
         return this.terrainY;
     }
 }
+

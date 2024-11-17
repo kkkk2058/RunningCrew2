@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Random;
+
 public class GameActivity extends AppCompatActivity {
     private PlayerModel playerModel;
     private PlayerView playerView;
@@ -20,6 +22,8 @@ public class GameActivity extends AppCompatActivity {
     private MonsterView monsterView;
     private MapModel mapModel;
     private MapView mapView;
+    private ItemModel itemModel;
+    private ItemView itemView;
 
     private FrameLayout gameView;
     private ImageView groundView;
@@ -63,12 +67,16 @@ public class GameActivity extends AppCompatActivity {
         // 플레이어와 몬스터 맵 모델 생성
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
         monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 5, 5);
-        mapModel = new MapModel(screenWidth, screenHeight);
+        Random random = new Random();
+        int randNum = random.nextInt(screenHeight-50);
+        mapModel = new MapModel(screenWidth, randNum);
+        itemModel = new ItemModel(screenWidth,screenHeight,randNum);
 
         // 플레이어와 몬스터 맵 뷰 생성
         playerView = new PlayerView(this, playerModel);
         monsterView = new MonsterView(this, monsterModel);
         mapView = new MapView(this, mapModel);
+        itemView = new ItemView(this, itemModel);
 
         // Pause 버튼 클릭 이벤트 설정
         btnPause.setOnClickListener(v -> pauseGame());
@@ -77,6 +85,7 @@ public class GameActivity extends AppCompatActivity {
         gameView.addView(monsterView);
         gameView.addView(playerView);
         gameView.addView(mapView);
+        gameView.addView(itemView);
 
         // 버튼 동작 설정
         setupButtonListeners();
@@ -98,10 +107,12 @@ public class GameActivity extends AppCompatActivity {
         new Thread(() -> {
             while (playerModel.isAlive()) {
                 runOnUiThread(() -> {
+
                     // 모델 업데이트
                     playerModel.updatePosition();
                     monsterModel.updatePosition();
-                    mapModel.updateposition();
+                    mapModel.updatePosition();
+                    itemModel.updatePosition();
 
                     // 충돌 체크
                     if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
