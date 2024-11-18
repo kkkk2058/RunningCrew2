@@ -80,7 +80,7 @@ public class GameActivity extends AppCompatActivity {
         mapView = new MapView(this, mapModel, randNum);
         itemView = new ItemView(this, itemModel);
 
-        // Pause 버튼 클릭 이벤트 설정
+        // Pause 버튼 클릭 이벤트 설정함
         btnPause.setOnClickListener(v -> pauseGame());
 
         // 게임 화면에 뷰 추가
