@@ -104,7 +104,7 @@ public class GameActivity extends AppCompatActivity {
         // 점프 버튼 클릭 이벤트 설정
         btnJump.setOnClickListener(v -> playerModel.jump());
     }
-
+//test
     private void startGameLoop() {
         new Thread(() -> {
             while (playerModel.isAlive()) {
