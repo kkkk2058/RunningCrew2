@@ -24,7 +24,7 @@ public class PauseActivity extends AppCompatActivity {
             Intent intent = new Intent(PauseActivity.this, MainMenuActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            finish(); // PauseActivity 종료
+            finish(); // PauseActivity 종료함
         });
     }
 }

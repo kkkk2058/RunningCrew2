@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#FAFAFA">
 
-    <!-- 게임 그래픽 영역 -->
+    <!-- 게임 그래픽 영역q -->
     <LinearLayout
         android:id="@+id/LinearLayout"
         android:layout_width="match_parent"
