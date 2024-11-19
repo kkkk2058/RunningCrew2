@@ -81,12 +81,12 @@ public class PlayerModel {
         return score;
     }
 
-//    public boolean checkCollision(float monsterX, float monsterY) {
-//        float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
-//        return distance < 100; // 임의로 100을 충돌 거리로 설정
-//    }
-//
-//
+    public boolean checkCollision(float monsterX, float monsterY) {
+        float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
+        return distance < 100; // 임의로 100을 충돌 거리로 설정
+    }
+
+
 //    // 아이템 효과 적용
 //    public void applyEffect(ItemType type) {
 //        switch (type) {
