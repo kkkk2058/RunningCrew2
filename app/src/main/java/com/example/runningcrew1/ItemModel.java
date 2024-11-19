@@ -7,22 +7,17 @@ public class ItemModel {
     private float displayWidth;
     private float displayHeight;
 
-    private float itemX = 0;
+    private float itemX;
     private float itemY = 0;
 
 
-    public ItemModel(int displayWidth,int displayHeight, int terrainY) {
+    public ItemModel(int displayWidth,int displayHeight) {
 
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
         this.itemX = displayWidth;
-
         Random random = new Random();
-        int randNum;
-        do {
-            randNum = random.nextInt(displayHeight - 50);
-        } while (terrainY == randNum);
-        this.itemY = randNum;
+        this.itemY = random.nextInt(displayHeight - 50);
 
     }
 
@@ -35,5 +30,9 @@ public class ItemModel {
     }
     public float getItemY(){
         return this.itemY;
+    }
+
+    public void setItemY(float itemY) {
+        this.itemY = itemY;
     }
 }
