@@ -8,7 +8,7 @@ public class PlayerModel {
     private float screenWidth, screenHeight; // 화면 크기
     private boolean isJumping; // 점프 상태
     private float jumpVelocity; // 점프 속도
-    private static final float GRAVITY = 2.5f; // 중력 가속도
+    private static final float GRAVITY = 1.5f; // 중력 가속도
 
     public PlayerModel(float startX, float startY, float screenWidth, float screenHeight) {
         this.x = startX;
