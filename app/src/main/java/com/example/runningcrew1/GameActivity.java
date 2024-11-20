@@ -24,6 +24,7 @@ public class GameActivity extends AppCompatActivity {
     private MonsterModel monsterModel;
     private MonsterView monsterView;
 
+
     private FrameLayout gameView;
     private ImageView groundView;
     private LinearLayout controllerLayout;
@@ -81,7 +82,7 @@ public class GameActivity extends AppCompatActivity {
 
         // 플레이어와 몬스터 맵 모델 생성
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
-        monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 5, 5);
+        monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 0, 1);
 
         // 플레이어와 몬스터 맵 뷰 생성
         playerView = new PlayerView(this, playerModel);
@@ -121,7 +122,7 @@ public class GameActivity extends AppCompatActivity {
     private void setupGroundMonster(int groundHeight) {
         // 땅 몬스터의 초기 X 위치를 동적으로 설정
         float startX = new Random().nextInt(screenWidth / 10); // 화면 왼쪽 절반 내 랜덤 위치
-        float speedX = 5; // 이동 속도
+        float speedX = 0; // 이동 속도
         groundMonsterModel = new GroundMonsterModel(startX, screenHeight - groundHeight, speedX);
 
         // 땅 몬스터 뷰 생성

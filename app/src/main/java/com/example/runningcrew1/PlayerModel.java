@@ -8,7 +8,8 @@ public class PlayerModel {
     private float screenWidth, screenHeight; // 화면 크기
     private boolean isJumping; // 점프 상태
     private float jumpVelocity; // 점프 속도
-    private static final float GRAVITY = 1.5f; // 중력 가속도
+    private static final float GRAVITY = 2.5f; // 중력 가속도
+    private static final float TOP_LIMIT = 100; // 화면 상단의 제한 (100px 여유)
 
     public PlayerModel(float startX, float startY, float screenWidth, float screenHeight) {
         this.x = startX;
@@ -41,7 +42,7 @@ public class PlayerModel {
     }
 
     public void jump() {
-        if (!isJumping) {
+        if (!isJumping || y > TOP_LIMIT) {
             isJumping = true;
             jumpVelocity = -30; // 점프 초기 속도
         }
@@ -51,6 +52,12 @@ public class PlayerModel {
         if (isJumping) {
             y += jumpVelocity; // 점프 이동
             jumpVelocity += GRAVITY; // 중력 효과
+
+            // 화면 상단 제한
+            if (y < TOP_LIMIT) {
+                y = TOP_LIMIT;
+                jumpVelocity = 0; // 상단에 도달하면 점프 정지
+            }
 
             // 땅에 닿으면 점프 종료
             if (y >= screenHeight - 500) {
@@ -85,35 +92,4 @@ public class PlayerModel {
         float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
         return distance < 100; // 임의로 100을 충돌 거리로 설정
     }
-
-
-//    // 아이템 효과 적용
-//    public void applyEffect(ItemType type) {
-//        switch (type) {
-//            case GROW:
-//                this.width *= 1.5; // 크기 증가
-//                this.height *= 1.5;
-//                break;
-//            case SHRINK:
-//                this.width *= 0.5; // 크기 감소
-//                this.height *= 0.5;
-//                break;
-//            case SPEEDUP:
-//                this.speed *= 1.5; // 속도 증가
-//                break;
-//        }
-//    }
-//
-//    // 효과 초기화 (예: 5초 후)
-//    public void resetEffect() {
-//        this.width = 100; // 기본 크기
-//        this.height = 100;
-//        this.speed = 5;   // 기본 속도
-//    }
-//
-//    // Getter 및 충돌 체크
-//    public boolean checkCollision(float itemX, float itemY) {
-//        return this.x < itemX + 50 && this.x + this.width > itemX &&
-//                this.y < itemY + 50 && this.y + this.height > itemY;
-//    }
 }
