@@ -9,6 +9,7 @@ public class PlayerModel {
     private boolean isJumping; // 점프 상태
     private float jumpVelocity; // 점프 속도
     private static final float GRAVITY = 2.5f; // 중력 가속도
+    private static final float TOP_LIMIT = 100; // 화면 상단의 제한 (100px 여유)
 
     public PlayerModel(float startX, float startY, float screenWidth, float screenHeight) {
         this.x = startX;
@@ -41,7 +42,7 @@ public class PlayerModel {
     }
 
     public void jump() {
-        if (!isJumping) {
+        if (!isJumping || y > TOP_LIMIT) {
             isJumping = true;
             jumpVelocity = -30; // 점프 초기 속도
         }
@@ -51,6 +52,12 @@ public class PlayerModel {
         if (isJumping) {
             y += jumpVelocity; // 점프 이동
             jumpVelocity += GRAVITY; // 중력 효과
+
+            // 화면 상단 제한
+            if (y < TOP_LIMIT) {
+                y = TOP_LIMIT;
+                jumpVelocity = 0; // 상단에 도달하면 점프 정지
+            }
 
             // 땅에 닿으면 점프 종료
             if (y >= screenHeight - 500) {
