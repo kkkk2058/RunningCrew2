@@ -23,10 +23,6 @@ public class GameActivity extends AppCompatActivity {
     private PlayerView playerView;
     private MonsterModel monsterModel;
     private MonsterView monsterView;
-    private MapModel mapModel;
-    private MapView mapView;
-    private ItemModel itemModel;
-    private ItemView itemView;
 
     private FrameLayout gameView;
     private ImageView groundView;
@@ -170,8 +166,6 @@ public class GameActivity extends AppCompatActivity {
                         // 기존 모델 업데이트
                         playerModel.updatePosition();
                         monsterModel.updatePosition();
-                        mapModel.updatePosition();
-                        itemModel.updatePosition();
 
                         // 땅 몬스터 업데이트
                         if (groundMonsterModel != null) { // null 체크
@@ -275,7 +269,6 @@ public class GameActivity extends AppCompatActivity {
             }
         }, 50);
     }
-<<<<<<< HEAD
 
     private void startMapGeneration() {
         mapHandler.postDelayed(new Runnable() {
@@ -389,4 +382,3 @@ public class GameActivity extends AppCompatActivity {
     }
 
 }
-
