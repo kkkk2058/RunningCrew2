@@ -94,7 +94,7 @@ public class GameActivity extends AppCompatActivity {
             setupGroundMonster(groundHeight);
         });
 
-        // 게임 루프 시작은 setupGroundMonster가 호출된 이후 실행되도록 보장
+        // 게임 루프 시작은 setupGroundMonster가 호출된 이후 실행되도록 보장 / 미정
         new Handler(Looper.getMainLooper()).postDelayed(() -> startGameLoop(), 100);
 
         // Pause 버튼 클릭 이벤트 설정
