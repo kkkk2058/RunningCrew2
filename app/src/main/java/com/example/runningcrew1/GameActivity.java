@@ -80,7 +80,8 @@ public class GameActivity extends AppCompatActivity {
         btnJump = findViewById(R.id.btnJump);
         btnPause = findViewById(R.id.btnPause);
 
-        // 플레이어와 몬스터 맵 모델 생성
+        // 플레이어와 몬스터 맵 모델 생성d
+
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
         monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 0, 1);
 
