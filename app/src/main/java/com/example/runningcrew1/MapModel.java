@@ -5,8 +5,8 @@ public class MapModel {
     private int displayWidth =0;
     private int displayHeight =0;
 
-    private int terrainX = 0;
-    private int terrainY = 0;
+    private int terrainX;
+    private int terrainY;
 
 
     public MapModel(int displayWidth, int randNum){
