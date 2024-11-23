@@ -6,9 +6,6 @@ public class GroundMonsterModel {
     private int groundHeight; // 지면 높이
     private boolean isActive;  // 몬스터 활성화 여부
 
-
-
-
     public GroundMonsterModel(float startX, int groundHeight, float speedX) {
         this.x = startX;
         this.groundHeight = groundHeight;
@@ -42,5 +39,13 @@ public class GroundMonsterModel {
 
     public float getY() {
         return y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
     }
 }

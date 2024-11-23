@@ -10,6 +10,7 @@ public class PlayerModel {
     private float jumpVelocity; // 점프 속도
     private static final float GRAVITY = 2.5f; // 중력 가속도
     private static final float TOP_LIMIT = 100; // 화면 상단의 제한 (100px 여유)
+    private final float attackRange = 200f; // 공격 범위 설정
 
     private float size = 1;
     private int playerWidth = 200;
@@ -133,6 +134,15 @@ public class PlayerModel {
     public boolean checkItemCollision(float itemX, float itemY) {
         return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
                 this.y < itemY + 50 && this.y + this.playerHeight > itemY;
+    }
+
+    public float getAttackRange() {
+        return attackRange;
+    }
+
+    public boolean isInAttackRange(float monsterX, float monsterY) {
+        float distance = (float) Math.sqrt(Math.pow(monsterX - x, 2) + Math.pow(monsterY - y, 2));
+        return distance <= attackRange;
     }
 }
 

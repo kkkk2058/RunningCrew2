@@ -49,23 +49,33 @@
 
         <Button
             android:id="@+id/btnLeft"
-            android:layout_width="100dp"
-            android:layout_height="70dp"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
             android:text="←"
             android:layout_weight="1" />
 
         <Button
             android:id="@+id/btnJump"
-            android:layout_width="100dp"
-            android:layout_height="70dp"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
             android:text="⤴"
             android:layout_weight="1" />
 
         <Button
             android:id="@+id/btnRight"
-            android:layout_width="100dp"
-            android:layout_height="70dp"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
             android:text="→"
             android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnAttack"
+            android:layout_width="90dp"
+            android:layout_height="50dp"
+            android:text="attack"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/white"
+            android:layout_margin="16dp"/>
+
     </LinearLayout>
 </RelativeLayout>
