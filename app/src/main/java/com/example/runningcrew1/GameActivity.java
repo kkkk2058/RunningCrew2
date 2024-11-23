@@ -28,7 +28,7 @@ public class GameActivity extends AppCompatActivity {
     private ImageView groundView;
     private LinearLayout controllerLayout;
 
-    private Button btnLeft, btnRight, btnJump, btnPause;
+    private Button btnLeft, btnRight, btnJump, btnPause, btnAttack;
 
     private int screenWidth;
     private int screenHeight;
@@ -66,8 +66,6 @@ public class GameActivity extends AppCompatActivity {
         screenWidth = screenSize.x;
         screenHeight = screenSize.y;
 
-
-
         // XML 뷰 찾기
         gameView = findViewById(R.id.gameView);
         groundView = findViewById(R.id.groundView);
@@ -77,6 +75,7 @@ public class GameActivity extends AppCompatActivity {
         btnRight = findViewById(R.id.btnRight);
         btnJump = findViewById(R.id.btnJump);
         btnPause = findViewById(R.id.btnPause);
+        btnAttack = findViewById(R.id.btnAttack);
 
         // 플레이어와 몬스터 맵 모델 생성d
 
@@ -140,6 +139,9 @@ public class GameActivity extends AppCompatActivity {
 
         // 점프 버튼 클릭 이벤트 설정
         btnJump.setOnClickListener(v -> playerModel.jump());
+
+        //공격 버튼 클릭 이벤트 설정
+        btnAttack.setOnClickListener(v -> attackMonsters());
     }
 
     private void startGameLoop() {
@@ -379,5 +381,23 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
+
+    private void attackMonsters() {
+        // 공중 몬스터 제거
+        for (int i = 0; i < mapModels.size(); i++) {
+            MonsterModel monster = monsterModel;
+            if (playerModel.isInAttackRange(monster.getX(), monster.getY())) {
+                gameView.removeView(monsterView);
+                mapModels.remove(i);
+                i--; // 리스트 크기 보정
+            }
+        }
+
+        // 땅 몬스터 제거
+        if (groundMonsterModel != null && playerModel.isInAttackRange(groundMonsterModel.getX(), groundMonsterModel.getY())) {
+            gameView.removeView(groundMonsterView);
+            groundMonsterModel = null;
+        }
+    }
 
 }
