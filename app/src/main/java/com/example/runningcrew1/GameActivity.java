@@ -5,7 +5,6 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -50,7 +49,6 @@ public class GameActivity extends AppCompatActivity {
     private Handler itemMovementHandler = new Handler(Looper.getMainLooper());
     private List<ItemModel> itemModels = new ArrayList<>();
     private List<ItemView> itemViews = new ArrayList<>();
-    // 추가된 필드 선언
     private GroundMonsterModel groundMonsterModel;
     private GroundMonsterView groundMonsterView;
 
@@ -88,6 +86,7 @@ public class GameActivity extends AppCompatActivity {
         // 플레이어와 몬스터 맵 뷰 생성
         playerView = new PlayerView(this, playerModel);
         monsterView = new MonsterView(this, monsterModel);
+        //roundMonsterView= new MonsterView(this, groundMonsterModel);
 
 
         // groundView 높이 계산 및 땅 몬스터 초기화
@@ -106,6 +105,7 @@ public class GameActivity extends AppCompatActivity {
         gameView.addView(monsterView);
         gameView.addView(playerView);
 
+
         // 버튼 동작 설정
         setupButtonListeners();
 
@@ -122,8 +122,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void setupGroundMonster(int groundHeight) {
         // 땅 몬스터의 초기 X 위치를 동적으로 설정
-        float startX = new Random().nextInt(screenWidth / 10); // 화면 왼쪽 절반 내 랜덤 위치
-        float speedX = 0; // 이동 속도
+        float startX = screenWidth;
+        float speedX = 1; // 이동 속도
         groundMonsterModel = new GroundMonsterModel(startX, screenHeight - groundHeight, speedX);
 
         // 땅 몬스터 뷰 생성
@@ -145,49 +145,38 @@ public class GameActivity extends AppCompatActivity {
     private void startGameLoop() {
         new Thread(() -> {
             while (playerModel.isAlive()) {
-                runOnUiThread(() -> {
-
-                    // 모델 업데이트
-                    playerModel.updatePosition();
-                    monsterModel.updatePosition();
-
-                    // 충돌 체크
-                    if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
-                        playerModel.setAlive(false);
-                        endGame();
-                    }
-
-                    // 점수 증가 로직
-                    playerModel.increaseScore(1);
-
-                    // 화면 업데이트
-                    playerView.invalidate();
-                });
-                if (!isGamePaused) {
+                if (!isGamePaused) { // 게임이 일시정지 상태일 때 업데이트 멈춤
                     runOnUiThread(() -> {
-                        // 기존 모델 업데이트
+                        // 플레이어와 몬스터 업데이트
                         playerModel.updatePosition();
                         monsterModel.updatePosition();
 
                         // 땅 몬스터 업데이트
-                        if (groundMonsterModel != null) { // null 체크
+                        if (groundMonsterModel != null) {
                             groundMonsterModel.updatePosition();
+                            if (groundMonsterModel.getX() < -50) {
+                                groundMonsterModel.setX(screenWidth);
+                            }
+
+                            // 충돌 체크
+                            if (playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY())) {
+                                playerModel.setAlive(false);
+                                endGame();
+                            }
                         }
 
-                        // 충돌 체크
-                        if ((playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) ||
-                                (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY()))) {
+                        // 충돌 체크 및 점수 업데이트
+                        if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
                             playerModel.setAlive(false);
                             endGame();
                         }
 
-                        // 점수 증가 로직
                         playerModel.increaseScore(1);
 
                         // 화면 갱신
                         playerView.invalidate();
                         monsterView.invalidate();
-                        if (groundMonsterView != null) { // null 체크
+                        if (groundMonsterView != null) {
                             groundMonsterView.invalidate();
                         }
                     });
@@ -231,7 +220,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private boolean handleMove(MotionEvent event, boolean isLeft) {
-        if (isGamePaused) return false; // 게임이 멈춘 상태에서는 동작 무시
+        if (isGamePaused) return false; // 일시정지 상태에서는 무시
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -303,23 +292,25 @@ public class GameActivity extends AppCompatActivity {
         movementHandler.post(new Runnable() {
             @Override
             public void run() {
-                // 모든 지형을 왼쪽으로 이동
+                if (isGamePaused) {
+                    movementHandler.postDelayed(this, 32); // 60FPS 유지
+                    return;
+                }
 
                 for (int i = 0; i < mapModels.size(); i++) {
                     MapModel mapModel = mapModels.get(i);
                     mapModel.updatePosition();
 
-                    Log.d("GameActivity", "Map updated at X: " + mapModel.getTerrainX());
-                    //  화면에서 벗어난 지형 제거
-//                    if (mapModel.getTerrainX() + 200 < 0) { // 20은 지형의 가로 크기
-//                        mapModels.remove(i);
-//                        gameView.removeView(mapViews.get(i));
-//                        mapViews.remove(i);
-//                        i--; // 리스트 크기 변화 보정
-//                    } else {
-//                        // MapView 위치 업데이트
-//                        mapViews.get(i).setX(mapModel.getTerrainX());
-//                    }
+                    // 화면에서 벗어난 맵 제거
+                    if (mapModel.getTerrainX() + 200 < 0) {
+                        mapModels.remove(i);
+                        gameView.removeView(mapViews.get(i));
+                        mapViews.remove(i);
+                        i--; // 리스트 크기 보정
+                    } else {
+                        // MapView 위치 업데이트
+                        mapViews.get(i).setX(mapModel.getTerrainX());
+                    }
                 }
 
                 // 16ms 후 반복 (약 60FPS)
@@ -355,21 +346,26 @@ public class GameActivity extends AppCompatActivity {
             }
         }, 2000); // 4초 후 처음 호출
     }
+
     private void startItemMovement() {
         itemMovementHandler.post(new Runnable() {
             @Override
             public void run() {
-                // 모든 아이템을 왼쪽으로 이동
+                if (isGamePaused) {
+                    itemMovementHandler.postDelayed(this, 16); // 60FPS 유지
+                    return;
+                }
+
                 for (int i = 0; i < itemModels.size(); i++) {
                     ItemModel itemModel = itemModels.get(i);
-                    itemModel.updatePosition(); // 아이템 위치 업데이트
+                    itemModel.updatePosition();
 
                     // 화면에서 벗어난 아이템 제거
-                    if (itemModel.getItemX() + 10 < 0) { // 10은 아이템 크기를 고려한 값
+                    if (itemModel.getItemX() + 10 < 0) {
                         itemModels.remove(i);
                         gameView.removeView(itemViews.get(i));
                         itemViews.remove(i);
-                        i--; // 리스트 크기 보정
+                        i--;
                     } else {
                         // ItemView 위치 업데이트
                         itemViews.get(i).setX(itemModel.getItemX());
@@ -382,5 +378,6 @@ public class GameActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }
