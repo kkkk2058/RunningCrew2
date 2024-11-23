@@ -1,5 +1,7 @@
 package com.example.runningcrew1;
 
+import android.util.Log;
+
 public class MapModel {
 
     private int displayWidth =0;
@@ -13,12 +15,14 @@ public class MapModel {
 
         this.displayWidth = displayWidth;
 
-        this.terrainX = displayWidth;
+        this.terrainX = displayWidth-200;
         this.terrainY = randNum;
     }
 
     public void updatePosition(){
         this.terrainX -= 1;
+        Log.d("UpdatePosition", "Map updated: X = " + this.terrainX);
+
     }
 
     public int getTerrainX(){

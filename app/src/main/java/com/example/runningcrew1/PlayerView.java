@@ -17,8 +17,8 @@ public class PlayerView extends View {
 
         // res/drawable/mario.jpg 이미지 로드 후 크기 조정
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.mario);
-        int desiredWidth = 200; // 원하는 너비
-        int desiredHeight = 200; // 원하는 높이
+        int desiredWidth = playerModel.getPlayerWidth(); // 원하는 너비
+        int desiredHeight = playerModel.getPlayerHeight(); // 원하는 높이
         this.playerBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
     }
 

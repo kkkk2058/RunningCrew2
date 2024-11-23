@@ -69,7 +69,6 @@ public class GameActivity extends AppCompatActivity {
         screenHeight = screenSize.y;
 
 
-
         // XML 뷰 찾기
         gameView = findViewById(R.id.gameView);
         groundView = findViewById(R.id.groundView);
@@ -92,7 +91,7 @@ public class GameActivity extends AppCompatActivity {
 
         // groundView 높이 계산 및 땅 몬스터 초기화
         groundView.post(() -> {
-            int groundHeight = groundView.getHeight() +150;
+            int groundHeight = groundView.getHeight() + 150;
             setupGroundMonster(groundHeight);
         });
 
@@ -108,12 +107,6 @@ public class GameActivity extends AppCompatActivity {
 
         // 버튼 동작 설정
         setupButtonListeners();
-
-        startMapGeneration();
-        startMapMovement();
-
-        startItemGeneration();
-        startItemMovement();
 
         // 게임 루프 시작
         startGameLoop();
@@ -144,12 +137,37 @@ public class GameActivity extends AppCompatActivity {
 
     private void startGameLoop() {
         new Thread(() -> {
+            int frameCounter = 0;
+            int newMapCounter = 120;
+            int newItemCounter = 120;
+
+            runOnUiThread(this::startMapGeneration);
+            runOnUiThread(this::startItemGeneration);
+
+
             while (playerModel.isAlive()) {
+                frameCounter++;
+
+                // 2초마다 맵 생성
+                if (frameCounter % newMapCounter == 0) {
+                    runOnUiThread(this::startMapGeneration);
+                }
+
+                // 4초마다 아이템 생성
+                if (frameCounter % newItemCounter == 0) {
+                    runOnUiThread(this::startItemGeneration);
+                }
+
                 runOnUiThread(() -> {
 
                     // 모델 업데이트
                     playerModel.updatePosition();
                     monsterModel.updatePosition();
+
+                    startMapMovement();
+                    startItemMovement();
+
+                    checkItemCollision();
 
                     // 충돌 체크
                     if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
@@ -168,6 +186,7 @@ public class GameActivity extends AppCompatActivity {
                         // 기존 모델 업데이트
                         playerModel.updatePosition();
                         monsterModel.updatePosition();
+
 
                         // 땅 몬스터 업데이트
                         if (groundMonsterModel != null) { // null 체크
@@ -201,7 +220,6 @@ public class GameActivity extends AppCompatActivity {
             }
         }).start();
     }
-
 
 
     private void pauseGame() {
@@ -273,114 +291,114 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startMapGeneration() {
-        mapHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!playerModel.isAlive())
-                    return;
 
-                Random random = new Random();
-                int randHeight = random.nextInt(screenHeight - 50); // 지형 높이 랜덤
-                int randNum = random.nextInt(5) + 1; // 가로 크기 랜덤 (1~5칸)
+        if (!playerModel.isAlive())
+            return;
+
+        Random random = new Random();
+        int randHeight = random.nextInt(screenHeight) + 50; // 지형 높이 랜덤
+        int randNum = random.nextInt(5) + 1; // 가로 크기 랜덤 (1~5칸)
 
 
-                MapModel newMapModel = new MapModel(screenWidth, randHeight);
-                MapView newMapView = new MapView(GameActivity.this, newMapModel, randNum);
+        MapModel newMapModel = new MapModel(screenWidth, randHeight);
+        MapView newMapView = new MapView(GameActivity.this, newMapModel, randNum);
 
-                mapModels.add(newMapModel);
-                mapViews.add(newMapView);
+        Log.d("GameActivity", "생성된 Map X값: " + newMapModel.getTerrainX() + ", 화면 가로 크기: " + screenWidth);
 
-                // 생성한 지형을 게임 화면에 추가
-                gameView.addView(newMapView);
+        mapModels.add(newMapModel);
+        mapViews.add(newMapView);
 
-                // 다음 호출 예약 (2초 후)
-                mapHandler.postDelayed(this, 4000);
-            }
-        }, 2000); // 2초 후 처음 호출 시작
+        // 생성한 지형을 게임 화면에 추가
+        gameView.addView(newMapView);
     }
 
     private void startMapMovement() {
-        movementHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // 모든 지형을 왼쪽으로 이동
 
-                for (int i = 0; i < mapModels.size(); i++) {
-                    MapModel mapModel = mapModels.get(i);
-                    mapModel.updatePosition();
+        for (int i = mapModels.size() - 1; i >= 0; i--) {
+            MapModel mapModel = mapModels.get(i);
+            mapModel.updatePosition();
 
-                    Log.d("GameActivity", "Map updated at X: " + mapModel.getTerrainX());
-                    //  화면에서 벗어난 지형 제거
-//                    if (mapModel.getTerrainX() + 200 < 0) { // 20은 지형의 가로 크기
-//                        mapModels.remove(i);
-//                        gameView.removeView(mapViews.get(i));
-//                        mapViews.remove(i);
-//                        i--; // 리스트 크기 변화 보정
-//                    } else {
-//                        // MapView 위치 업데이트
-//                        mapViews.get(i).setX(mapModel.getTerrainX());
-//                    }
-                }
-
-                // 16ms 후 반복 (약 60FPS)
-                movementHandler.postDelayed(this, 32);
+            //화면에서 벗어난 지형 제거
+            if (mapModel.getTerrainX() + 200 < 0) { // 20은 지형의 가로 크기
+                mapModels.remove(i);
+                gameView.removeView(mapViews.get(i));
+                mapViews.remove(i);
+            } else {
+                // MapView 위치 업데이트
+                mapViews.get(i).setX(mapModel.getTerrainX());
             }
-        });
+        }
     }
 
     private void startItemGeneration() {
-        itemHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!playerModel.isAlive())
-                    return;
+        Log.d("GameActivity", "아이템 생성 호출됨 ");
 
-                ItemModel newItemModel = new ItemModel(screenWidth, screenHeight);
-                ItemView newItemView = new ItemView(GameActivity.this, newItemModel);
+        if (!playerModel.isAlive())
+            return;
 
-                if (!mapModels.isEmpty()) {
-                    MapModel lastMap = mapModels.get(mapModels.size() - 1);
-                    if (Math.abs(lastMap.getTerrainY() - newItemModel.getItemY()) < 10) {
-                        newItemModel.setItemY(newItemModel.getItemY() + 10);
-                    }
-                }
+        ItemModel newItemModel = new ItemModel(screenWidth, screenHeight);
+        ItemView newItemView = new ItemView(GameActivity.this, newItemModel);
 
-                // 리스트와 뷰에 추가
-                itemModels.add(newItemModel);
-                itemViews.add(newItemView);
-                gameView.addView(newItemView);
-
-                // 4초 후 다시 실행
-                itemHandler.postDelayed(this, 4000);
+        if (!mapModels.isEmpty()) {
+            MapModel lastMap = mapModels.get(mapModels.size() - 1);
+            if (Math.abs(lastMap.getTerrainY() - newItemModel.getItemY()) < 10) {
+                newItemModel.setItemY(newItemModel.getItemY() - 30);
             }
-        }, 2000); // 4초 후 처음 호출
+        }
+
+        // 리스트와 뷰에 추가
+        itemModels.add(newItemModel);
+        itemViews.add(newItemView);
+        gameView.addView(newItemView);
+
     }
+
     private void startItemMovement() {
-        itemMovementHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                // 모든 아이템을 왼쪽으로 이동
-                for (int i = 0; i < itemModels.size(); i++) {
-                    ItemModel itemModel = itemModels.get(i);
-                    itemModel.updatePosition(); // 아이템 위치 업데이트
+        // 모든 아이템을 왼쪽으로 이동
+        for (int i = itemModels.size() - 1; i >= 0; i--) {
+            ItemModel itemModel = itemModels.get(i);
+            itemModel.updatePosition(); // 아이템 위치 업데이트
 
-                    // 화면에서 벗어난 아이템 제거
-                    if (itemModel.getItemX() + 10 < 0) { // 10은 아이템 크기를 고려한 값
-                        itemModels.remove(i);
-                        gameView.removeView(itemViews.get(i));
-                        itemViews.remove(i);
-                        i--; // 리스트 크기 보정
-                    } else {
-                        // ItemView 위치 업데이트
-                        itemViews.get(i).setX(itemModel.getItemX());
-                        itemViews.get(i).setY(itemModel.getItemY());
-                    }
-                }
+            // 화면에서 벗어난 아이템 제거
+            if (itemModel.getItemX() + 50 < 0) { // 10은 아이템 크기를 고려한 값
+                itemModels.remove(i);
+                gameView.removeView(itemViews.get(i));
+                itemViews.remove(i);
+            } else {
+                // ItemView 위치 업데이트
+                ItemView itemView = itemViews.get(i);
+                itemView.setX(itemModel.getItemX());
+                itemView.setY(itemModel.getItemY());
+                itemView.invalidate();
 
-                // 16ms 후 반복 (약 60FPS)
-                itemMovementHandler.postDelayed(this, 16);
             }
-        });
+        }
+
+    }
+
+    private void checkItemCollision() {
+        for (int i = 0; i < itemModels.size(); i++) {
+            ItemModel item = itemModels.get(i);
+
+            // 플레이어와 아이템 충돌 여부 확인
+            if (playerModel.checkItemCollision(item.getItemX(), item.getItemY())) { // 50은 아이템 크기
+                // 아이템 효과 적용
+                playerModel.applyEffect(item.getType());
+
+                playerView.invalidate();
+
+                // 충돌한 아이템 제거
+                gameView.removeView(itemViews.get(i));
+                itemModels.remove(i);
+                itemViews.remove(i);
+                i--; // 리스트 크기 보정
+
+                Log.d("GameActivity", "아이템 효과 적용됨: " + item.getType());
+
+
+
+            }
+        }
     }
 
 }

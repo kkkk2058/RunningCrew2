@@ -1,5 +1,7 @@
 package com.example.runningcrew1;
 
+import android.util.Log;
+
 import java.util.Random;
 
 public class ItemModel {
@@ -13,8 +15,8 @@ public class ItemModel {
     private float displayWidth;
     private float displayHeight;
 
-    private float itemX;
-    private float itemY = 0;
+    private static float itemX;
+    private static float itemY = 0;
 
 
     public ItemModel(int displayWidth,int displayHeight) {
@@ -30,6 +32,8 @@ public class ItemModel {
 
     public void updatePosition(){
         this.itemX -= 1;
+        Log.d("UpdatePosition", "Item updated: X = " + this.itemX);
+
     }
 
     public float getItemX(){
@@ -59,6 +63,13 @@ public class ItemModel {
 
     public ItemType getType() {
         return type;
+    }
+
+    public static float getX(){
+        return itemX;
+    }
+    public static float getY(){
+        return itemY;
     }
 
 }
