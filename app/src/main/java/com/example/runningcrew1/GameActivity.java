@@ -79,7 +79,7 @@ public class GameActivity extends AppCompatActivity {
 
         // 플레이어와 몬스터 맵 모델 생성d
 
-        playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 500, screenWidth, screenHeight);
+        playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 400, screenWidth, screenHeight);
         monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 0, 1);
 
         // 플레이어와 몬스터 맵 뷰 생성

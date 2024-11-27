@@ -8,7 +8,7 @@ public class PlayerModel {
     private float screenWidth, screenHeight; // 화면 크기
     private boolean isJumping; // 점프 상태
     private float jumpVelocity; // 점프 속도
-    private static final float GRAVITY = 0.5f; // 중력 가속도
+    private static final float GRAVITY = 2.5f; // 중력 가속도
     private static final float TOP_LIMIT = 100; // 화면 상단의 제한 (100px 여유)
     private final float attackRange = 200f; // 공격 범위 설정
 
@@ -61,8 +61,8 @@ public class PlayerModel {
             }
 
             // 땅에 닿으면 점프 종료
-            if (y >= screenHeight - 500) {
-                y = screenHeight - 500;
+            if (y >= screenHeight - 400) {
+                y = screenHeight - 400;
                 isJumping = false;
             }
         }
