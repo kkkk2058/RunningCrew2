@@ -98,6 +98,18 @@ public class PlayerModel {
     public int getPlayerHeight(){
         return playerHeight;
     }
+    public float getPlayerSpeed() {
+        return speed;
+    }
+    public void setPlayerWidth(int width) {
+        this.playerWidth = width;
+    }
+    public void setPlayerHeight(int height) {
+        this.playerHeight = height;
+    }
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
 
     public boolean checkCollision(float monsterX, float monsterY) {
         float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
@@ -144,5 +156,7 @@ public class PlayerModel {
         float distance = (float) Math.sqrt(Math.pow(monsterX - x, 2) + Math.pow(monsterY - y, 2));
         return distance <= attackRange;
     }
+
+
 }
 

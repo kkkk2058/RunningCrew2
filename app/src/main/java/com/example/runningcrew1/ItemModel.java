@@ -15,8 +15,8 @@ public class ItemModel {
     private float displayWidth;
     private float displayHeight;
 
-    private static float itemX;
-    private static float itemY = 0;
+    private int itemX;
+    private int itemY = 0;
 
 
     public ItemModel(int displayWidth,int displayHeight) {
@@ -43,7 +43,7 @@ public class ItemModel {
         return this.itemY;
     }
 
-    public void setItemY(float itemY) {
+    public void setItemY(int itemY) {
         this.itemY = itemY;
     }
 
@@ -65,10 +65,10 @@ public class ItemModel {
         return type;
     }
 
-    public static float getX(){
+    public int getX(){
         return itemX;
     }
-    public static float getY(){
+    public int getY(){
         return itemY;
     }
 

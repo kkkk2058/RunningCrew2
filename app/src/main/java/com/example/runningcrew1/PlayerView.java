@@ -34,4 +34,16 @@ public class PlayerView extends View {
         }
         invalidate(); // 지속적으로 화면 갱신
     }
+    public void updateView() {
+        updateBitmap(); // 크기 변경된 비트맵 생성
+        invalidate();   // 뷰를 다시 그리기
+    }
+
+    private void updateBitmap() {
+        // 현재 모델의 크기를 기반으로 비트맵 업데이트
+        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.mario);
+        int desiredWidth = playerModel.getPlayerWidth(); // 모델의 현재 너비
+        int desiredHeight = playerModel.getPlayerHeight(); // 모델의 현재 높이
+        this.playerBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
+    }
 }

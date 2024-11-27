@@ -108,11 +108,6 @@ public class GameActivity extends AppCompatActivity {
         // 버튼 동작 설정
         setupButtonListeners();
 
-        startMapGeneration();
-        startMapMovement();
-
-        startItemGeneration();
-        startItemMovement();
 
         // 게임 루프 시작
         startGameLoop();
@@ -150,8 +145,8 @@ public class GameActivity extends AppCompatActivity {
             int newMapCounter = 120;
             int newItemCounter = 120;
 
-            runOnUiThread(this::startMapGeneration);
-            runOnUiThread(this::startItemGeneration);
+            //runOnUiThread(this::startMapGeneration);
+            //runOnUiThread(this::startItemGeneration);
 
 
             while (playerModel.isAlive()) {
@@ -310,7 +305,7 @@ public class GameActivity extends AppCompatActivity {
         MapModel newMapModel = new MapModel(screenWidth, randHeight);
         MapView newMapView = new MapView(GameActivity.this, newMapModel, randNum);
 
-        Log.d("GameActivity", "생성된 Map X값: " + newMapModel.getTerrainX() + ", 화면 가로 크기: " + screenWidth);
+        Log.d("GameActivity", "생성된 Map X값: " + newMapModel.getTerrainX() + ", 화면 가로 크기: " + screenWidth + "세로 크기:" + screenHeight);
 
         mapModels.add(newMapModel);
         mapViews.add(newMapView);
@@ -332,8 +327,9 @@ public class GameActivity extends AppCompatActivity {
                 mapViews.remove(i);
             } else {
                 // MapView 위치 업데이트
-                mapViews.get(i).setX(mapModel.getTerrainX());
+               mapViews.get(i).setX(mapModel.getTerrainX());
             }
+            //mapViews.get(i).setX(mapModel.getTerrainX());
         }
     }
 
@@ -349,7 +345,7 @@ public class GameActivity extends AppCompatActivity {
         if (!mapModels.isEmpty()) {
             MapModel lastMap = mapModels.get(mapModels.size() - 1);
             if (Math.abs(lastMap.getTerrainY() - newItemModel.getItemY()) < 10) {
-                newItemModel.setItemY(newItemModel.getItemY() - 30);
+                newItemModel.setItemY((int) (newItemModel.getItemY() - 30));
             }
         }
 
@@ -375,9 +371,7 @@ public class GameActivity extends AppCompatActivity {
                 // ItemView 위치 업데이트
                 ItemView itemView = itemViews.get(i);
                 itemView.setX(itemModel.getItemX());
-                itemView.setY(itemModel.getItemY());
                 itemView.invalidate();
-
             }
         }
 
@@ -391,8 +385,9 @@ public class GameActivity extends AppCompatActivity {
             if (playerModel.checkItemCollision(item.getItemX(), item.getItemY())) { // 50은 아이템 크기
                 // 아이템 효과 적용
                 playerModel.applyEffect(item.getType());
+                playerView.updateView();
 
-                playerView.invalidate();
+                restorePlayerEffectAfterDelay(item.getType());
 
                 // 충돌한 아이템 제거
                 gameView.removeView(itemViews.get(i));
@@ -402,11 +397,29 @@ public class GameActivity extends AppCompatActivity {
 
                 Log.d("GameActivity", "아이템 효과 적용됨: " + item.getType());
 
-
-
             }
         }
     }
+    private void restorePlayerEffectAfterDelay(ItemModel.ItemType type) {
+        // 3초 후 원래 상태 복구
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            switch (type) {
+                case GROW:
+                    playerModel.setPlayerWidth(playerModel.getPlayerWidth()/2);
+                    playerModel.setPlayerHeight(playerModel.getPlayerHeight()/2);
+                    break;
+                case SHRINK:
+                    playerModel.setPlayerWidth(playerModel.getPlayerWidth()*2);
+                    playerModel.setPlayerHeight(playerModel.getPlayerHeight()*2);
+                    break;
+                case SPEEDUP:
+                    playerModel.setSpeed(playerModel.getPlayerSpeed()/2);
+                    break;
+            }
+            playerView.updateView(); // 화면 갱신
+        }, 3000); // 3초 딜레이
+    }
+
 
 
     private void attackMonsters() {
