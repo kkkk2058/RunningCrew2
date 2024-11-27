@@ -30,6 +30,6 @@ public class ItemView extends View {
             float y = itemModel.getItemY() - (mapBitmap.getHeight() / 2);
             canvas.drawBitmap(mapBitmap, x, y, null);
         }
-        invalidate();
+        //invalidate();
     }
 }

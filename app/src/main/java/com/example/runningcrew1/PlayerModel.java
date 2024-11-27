@@ -12,6 +12,9 @@ public class PlayerModel {
     private static final float TOP_LIMIT = 100; // 화면 상단의 제한 (100px 여유)
     private final float attackRange = 200f; // 공격 범위 설정
 
+    private float size = 1;
+    private int playerWidth = 200;
+    private int playerHeight = 200;
     public PlayerModel(float startX, float startY, float screenWidth, float screenHeight) {
         this.x = startX;
         this.y = startY;
@@ -89,9 +92,48 @@ public class PlayerModel {
         return score;
     }
 
+    public int getPlayerWidth(){
+        return playerWidth;
+    }
+    public int getPlayerHeight(){
+        return playerHeight;
+    }
+
     public boolean checkCollision(float monsterX, float monsterY) {
         float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
         return distance < 100; // 임의로 100을 충돌 거리로 설정
+    }
+
+
+    // 아이템 효과 적용
+    public void applyEffect(ItemModel.ItemType type) {
+        switch (type) {
+            case GROW:
+                //this.size *= 2; // 크기 증가
+                this.playerHeight *= 2;
+                this.playerWidth *= 2;
+                break;
+            case SHRINK:
+                //this.size *= 0.5; // 크기 감소
+                this.playerHeight *= 0.5;
+                this.playerWidth *= 0.5;
+                break;
+            case SPEEDUP:
+                this.speed *= 1.5; // 속도 증가
+                break;
+        }
+    }
+
+    // 효과 초기화 (예: 5초 후)
+    public void resetEffect() {
+        this.size = 1; // 기본 크기
+        this.speed = 5;   // 기본 속도
+    }
+
+    // Getter 및 충돌 체크
+    public boolean checkItemCollision(float itemX, float itemY) {
+        return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
+                this.y < itemY + 50 && this.y + this.playerHeight > itemY;
     }
 
     public float getAttackRange() {
@@ -103,3 +145,4 @@ public class PlayerModel {
         return distance <= attackRange;
     }
 }
+
