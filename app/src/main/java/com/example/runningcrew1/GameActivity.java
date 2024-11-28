@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -78,6 +80,13 @@ public class GameActivity extends AppCompatActivity {
         btnPause = findViewById(R.id.btnPause);
         btnAttack = findViewById(R.id.btnAttack);
 
+        // 키보드 입력 감지 설정
+        View mainView = findViewById(android.R.id.content);
+        mainView.setFocusableInTouchMode(true);
+        mainView.requestFocus();
+        mainView.setOnKeyListener(this::handleKeyboardInput);
+
+
         // 플레이어와 몬스터 맵 모델 생성d
 
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 400, screenWidth, screenHeight);
@@ -138,6 +147,57 @@ public class GameActivity extends AppCompatActivity {
         //공격 버튼 클릭 이벤트 설정
         btnAttack.setOnClickListener(v -> attackMonsters());
     }
+
+    private boolean handleKeyboardInput(View v, int keyCode, KeyEvent event) {
+        if (isGamePaused) return false; // 일시정지 상태에서는 무시
+
+        // 키 입력 이벤트 처리
+        switch (event.getAction()) {
+            case KeyEvent.ACTION_DOWN:
+                // 연속 이동 동작 시작
+                if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_A) {
+                    if (!isMovingLeft) { // 이미 이동 중이 아니면 시작
+                        isMovingLeft = true;
+                        startContinuousMove(true);
+                    }
+                    return true;
+                }
+
+                if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_D) {
+                    if (!isMovingRight) { // 이미 이동 중이 아니면 시작
+                        isMovingRight = true;
+                        startContinuousMove(false);
+                    }
+                    return true;
+                }
+
+                if (keyCode == KeyEvent.KEYCODE_SPACE || keyCode == KeyEvent.KEYCODE_W) {
+                    playerModel.jump();
+                    return true;
+                }
+
+                if (keyCode == KeyEvent.KEYCODE_K) {
+                    attackMonsters();
+                    return true;
+                }
+                break;
+
+            case KeyEvent.ACTION_UP:
+                // 연속 이동 동작 중지
+                if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_A) {
+                    isMovingLeft = false; // 이동 중지
+                    return true;
+                }
+
+                if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_D) {
+                    isMovingRight = false; // 이동 중지
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
 
     private void startGameLoop() {
         new Thread(() -> {
@@ -439,5 +499,6 @@ public class GameActivity extends AppCompatActivity {
             groundMonsterModel = null;
         }
     }
+
 
 }
