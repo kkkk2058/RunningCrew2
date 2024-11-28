@@ -258,7 +258,8 @@ public class GameActivity extends AppCompatActivity {
                         }
 
                         // 충돌 체크 및 점수 업데이트
-                        if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
+                        if ((playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) ||
+                                (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY()))) {
                             playerModel.setAlive(false);
                             endGame();
                         }
