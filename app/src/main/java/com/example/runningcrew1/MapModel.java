@@ -1,6 +1,5 @@
-package com.example.runningcrew1;
 
-import android.util.Log;
+package com.example.runningcrew1;
 
 public class MapModel {
 
@@ -21,7 +20,7 @@ public class MapModel {
 
     public void updatePosition(){
         this.terrainX -= 1;
-        Log.d("UpdatePosition", "Map updated: X = " + this.terrainX);
+//        Log.d("UpdatePosition", "Map updated: X = " + this.terrainX);
 
     }
 

@@ -1,7 +1,5 @@
 package com.example.runningcrew1;
 
-import android.util.Log;
-
 import java.util.Random;
 
 public class ItemModel {
@@ -32,7 +30,7 @@ public class ItemModel {
 
     public void updatePosition(){
         this.itemX -= 1;
-        Log.d("UpdatePosition", "Item updated: X = " + this.itemX);
+//        Log .d("UpdatePosition", "Item updated: X = " + this.itemX);
 
     }
 
