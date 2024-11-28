@@ -14,8 +14,8 @@ public class MonsterView extends View {
         super(context);
         this.monsterModel = model;
 
-        // monster.png 이미지 로드 후 크기 조정 (예: 100x100 크기로 축소)
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.monster);
+
+        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ground_monster);
         int desiredWidth = 200; // 원하는 너비
         int desiredHeight = 200; // 원하는 높이
         this.monsterBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);

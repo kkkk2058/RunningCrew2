@@ -10,7 +10,7 @@
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2인용 게임"
+        android:text="러닝 크루"
         android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -23,6 +23,9 @@
         android:text="1인용 Echo 모드" />
 
     <Button
+
+
+
         android:id="@+id/btnBattleMode"
         android:layout_width="200dp"
         android:layout_height="wrap_content"

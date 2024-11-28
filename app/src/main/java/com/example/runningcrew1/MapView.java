@@ -27,6 +27,7 @@ public class MapView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+
         if (mapBitmap != null) {
             for (int i = 0; i < randNum; i++) {
                 float x = mapModel.getTerrainX() - (mapBitmap.getWidth() / 2) + (i * mapBitmap.getWidth());
@@ -35,6 +36,9 @@ public class MapView extends View {
                 canvas.drawBitmap(mapBitmap, x, y, null);
             }
         }
-        invalidate();
+        //invalidate();
+    }
+    public void updateView() {
+        invalidate(); // 필요할 때만 호출
     }
 }
