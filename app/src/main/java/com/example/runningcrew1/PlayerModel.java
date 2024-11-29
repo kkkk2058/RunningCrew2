@@ -65,8 +65,8 @@ public class PlayerModel {
             }
 
             // 땅에 닿으면 점프 종료
-            if (y >= screenHeight - 500) {
-                y = screenHeight - 500;
+            if (y >= screenHeight - 400) {
+                y = screenHeight - 400;
                 isJumping = false;
             }
         }
