@@ -121,28 +121,19 @@ public class PlayerModel {
     public void applyEffect(ItemModel.ItemType type) {
         switch (type) {
             case GROW:
-                //this.size *= 2; // 크기 증가
                 this.playerHeight *= 2;
                 this.playerWidth *= 2;
                 break;
             case SHRINK:
-                //this.size *= 0.5; // 크기 감소
                 this.playerHeight *= 0.5;
                 this.playerWidth *= 0.5;
                 break;
             case SPEEDUP:
-                this.speed *= 1.5; // 속도 증가
+                this.speed *= 1.5;
                 break;
         }
     }
 
-    // 효과 초기화 (예: 5초 후)
-    public void resetEffect() {
-        this.size = 1; // 기본 크기
-        this.speed = 5;   // 기본 속도
-    }
-
-    // Getter 및 충돌 체크
     public boolean checkItemCollision(float itemX, float itemY) {
         return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
                 this.y < itemY + 50 && this.y + this.playerHeight > itemY;
