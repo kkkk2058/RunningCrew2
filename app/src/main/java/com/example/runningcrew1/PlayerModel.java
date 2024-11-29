@@ -1,3 +1,4 @@
+
 package com.example.runningcrew1;
 
 public class PlayerModel {
@@ -64,8 +65,8 @@ public class PlayerModel {
             }
 
             // 땅에 닿으면 점프 종료
-            if (y >= screenHeight - 500) {
-                y = screenHeight - 500;
+            if (y >= screenHeight - 400) {
+                y = screenHeight - 400;
                 isJumping = false;
             }
         }
@@ -147,7 +148,4 @@ public class PlayerModel {
         float distance = (float) Math.sqrt(Math.pow(monsterX - x, 2) + Math.pow(monsterY - y, 2));
         return distance <= attackRange;
     }
-
-
 }
-
