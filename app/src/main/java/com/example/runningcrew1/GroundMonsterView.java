@@ -16,7 +16,7 @@ public class GroundMonsterView extends View {
         this.groundMonsterModel = model;
 
         try {
-            Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ground_monster);
+            Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.monster);
             int desiredWidth = 150; // 원하는 너비
             int desiredHeight = 150; // 원하는 높이
             this.groundMonsterBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);

@@ -95,8 +95,8 @@ public class GameActivity extends AppCompatActivity {
             setupGroundMonster(groundHeight);
         });
 
-        // 게임 루프 시작은 setupGroundMonster가 호출된 이후 실행되도록 보장 / 미정
-        new Handler(Looper.getMainLooper()).postDelayed(() -> startGameLoop(), 100);
+//        // 게임 루프 시작은 setupGroundMonster가 호출된 이후 실행되도록 보장 / 미정
+//        new Handler(Looper.getMainLooper()).postDelayed(() -> startGameLoop(), 100);
 
         // Pause 버튼 클릭 이벤트 설정
         btnPause.setOnClickListener(v -> pauseGame());
@@ -145,11 +145,17 @@ public class GameActivity extends AppCompatActivity {
             int newMapCounter = 120;
             int newItemCounter = 120;
 
-            //runOnUiThread(this::startMapGeneration);
-            //runOnUiThread(this::startItemGeneration);
-
-
             while (playerModel.isAlive()) {
+                // pause 상태일 때 루프를 멈춤
+                if (isGamePaused) {
+                    try {
+                        Thread.sleep(100); // pause 상태에서 루프를 잠시 멈춤
+                        continue;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 frameCounter++;
 
                 // 2초마다 맵 생성
@@ -163,7 +169,6 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 runOnUiThread(() -> {
-
                     // 모델 업데이트
                     playerModel.updatePosition();
                     monsterModel.updatePosition();
@@ -185,20 +190,26 @@ public class GameActivity extends AppCompatActivity {
                     // 화면 업데이트
                     playerView.invalidate();
                 });
+
                 if (!isGamePaused) {
                     runOnUiThread(() -> {
                         // 기존 모델 업데이트
                         playerModel.updatePosition();
                         monsterModel.updatePosition();
 
-
                         // 땅 몬스터 업데이트
-                        if (groundMonsterModel != null) { // null 체크
+                        if (groundMonsterModel != null) {
                             groundMonsterModel.updatePosition();
                         }
 
                         // 충돌 체크 및 점수 업데이트
                         if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
+                            playerModel.setAlive(false);
+                            endGame();
+                        }
+
+                        // 땅 몬스터와의 충돌 체크
+                        if (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY())) {
                             playerModel.setAlive(false);
                             endGame();
                         }
@@ -222,6 +233,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }).start();
     }
+
 
 
     private void pauseGame() {
@@ -294,6 +306,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void startMapGeneration() {
 
+        if (isGamePaused) return;
+
         if (!playerModel.isAlive())
             return;
 
@@ -316,6 +330,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void startMapMovement() {
 
+        if (isGamePaused) return;
+
         for (int i = mapModels.size() - 1; i >= 0; i--) {
             MapModel mapModel = mapModels.get(i);
             mapModel.updatePosition();
@@ -327,14 +343,16 @@ public class GameActivity extends AppCompatActivity {
                 mapViews.remove(i);
             } else {
                 // MapView 위치 업데이트
-               mapViews.get(i).setX(mapModel.getTerrainX());
+                mapViews.get(i).setX(mapModel.getTerrainX());
             }
             //mapViews.get(i).setX(mapModel.getTerrainX());
         }
     }
 
     private void startItemGeneration() {
+
         Log.d("GameActivity", "아이템 생성 호출됨 ");
+        if (isGamePaused) return;
 
         if (!playerModel.isAlive())
             return;
@@ -357,6 +375,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startItemMovement() {
+
+        if (isGamePaused) return;
         // 모든 아이템을 왼쪽으로 이동
         for (int i = itemModels.size() - 1; i >= 0; i--) {
             ItemModel itemModel = itemModels.get(i);

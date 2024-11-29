@@ -1,3 +1,4 @@
+
 package com.example.runningcrew1;
 
 public class PlayerModel {
@@ -156,7 +157,4 @@ public class PlayerModel {
         float distance = (float) Math.sqrt(Math.pow(monsterX - x, 2) + Math.pow(monsterY - y, 2));
         return distance <= attackRange;
     }
-
-
 }
-
