@@ -18,8 +18,8 @@ public class MapView extends View {
 
 
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
-        int desiredWidth = 100; // 원하는 너비
-        int desiredHeight = 100; // 원하는 높이
+        int desiredWidth = 100;
+        int desiredHeight = 100;
         this.mapBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
     }
 
@@ -36,9 +36,8 @@ public class MapView extends View {
                 canvas.drawBitmap(mapBitmap, x, y, null);
             }
         }
-        //invalidate();
     }
     public void updateView() {
-        invalidate(); // 필요할 때만 호출
+        invalidate();
     }
 }
