@@ -377,7 +377,7 @@ public class GameActivity extends AppCompatActivity {
         MapModel newMapModel = new MapModel(screenWidth, randHeight);
         MapView newMapView = new MapView(GameActivity.this, newMapModel, randNum);
 
-        Log.d("GameActivity", "생성된 Map X값: " + newMapModel.getTerrainX() + ", 화면 가로 크기: " + screenWidth + "세로 크기:" + screenHeight);
+        Log.d("GameActivity", "생성된 Map X값: " + newMapModel.getTerrainX() + ",랜덤num " + randNum);
 
         mapModels.add(newMapModel);
         mapViews.add(newMapView);
@@ -424,6 +424,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
+
         itemModels.add(newItemModel);
         itemViews.add(newItemView);
         gameView.addView(newItemView);
@@ -461,7 +462,12 @@ public class GameActivity extends AppCompatActivity {
 
                 restorePlayerEffectAfterDelay(item.getType());
 
-                gameView.removeView(itemViews.get(i));
+
+                //gameView.removeView(itemViews.get(i));
+                int finalI = i;
+                runOnUiThread(() -> {
+                    gameView.removeView(itemViews.get(finalI));
+                });
                 itemModels.remove(i);
                 itemViews.remove(i);
                 i--;
