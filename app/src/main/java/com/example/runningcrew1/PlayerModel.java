@@ -1,6 +1,8 @@
 
 package com.example.runningcrew1;
 
+import android.util.Log;
+
 public class PlayerModel {
     private float x, y; // 플레이어 위치
     private float speed; // 플레이어 이동 속도
@@ -39,11 +41,14 @@ public class PlayerModel {
     public void moveLeft() {
         x -= speed;
         if (x < 0) x = 0;
+        Log.d("PlayerPosition", "Moved Left: X = " + x + ", Y = " + y);
     }
 
     public void moveRight() {
         x += speed;
         if (x > screenWidth) x = screenWidth;
+        Log.d("PlayerPosition", "Moved Right: X = " + x + ", Y = " + y);
+
     }
 
     public void jump() {
@@ -116,9 +121,6 @@ public class PlayerModel {
         float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
         return distance < 100; // 임의로 100을 충돌 거리로 설정
     }
-
-
-    // 아이템 효과 적용
     public void applyEffect(ItemModel.ItemType type) {
         switch (type) {
             case GROW:
@@ -134,10 +136,11 @@ public class PlayerModel {
                 break;
         }
     }
-
     public boolean checkItemCollision(float itemX, float itemY) {
-        return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
-                this.y < itemY + 50 && this.y + this.playerHeight > itemY;
+        //return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
+        //        this.y < itemY + 50 && this.y + this.playerHeight > itemY;
+        float distance = (float) Math.sqrt(Math.pow(x - itemX, 2) + Math.pow(y - itemY, 2));
+        return distance < 100; // 임의로 100을 충돌 거리로 설정
     }
 
     public float getAttackRange() {
