@@ -83,16 +83,16 @@ public class GameActivity extends AppCompatActivity {
         mainView.requestFocus();
         mainView.setOnKeyListener(this::handleKeyboardInput);
 
+
         // 플레이어 초기화
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 400, screenWidth, screenHeight);
         playerView = new PlayerView(this, playerModel);
         gameView.addView(playerView);
 
-        // 버튼 동작 설정
+
         setupButtonListeners();
 
         StateManager.setCurrentState(StateManager.GameState.RUNNING);
-
         // 게임 루프 시작
         startGameLoop();
     }
@@ -106,6 +106,8 @@ public class GameActivity extends AppCompatActivity {
 
         // 점프 버튼 클릭 이벤트 설정
         btnJump.setOnClickListener(v -> playerModel.jump());
+
+        btnPause.setOnClickListener(v -> pauseGame());
 
         //공격 버튼 클릭 이벤트 설정
         btnAttack.setOnClickListener(v -> attackMonsters());
