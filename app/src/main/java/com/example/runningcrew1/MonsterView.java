@@ -15,7 +15,7 @@ public class MonsterView extends View {
         this.monsterModel = model;
 
 
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ground_monster);
+        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.monster);
         int desiredWidth = 200; // 원하는 너비
         int desiredHeight = 200; // 원하는 높이
         this.monsterBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
