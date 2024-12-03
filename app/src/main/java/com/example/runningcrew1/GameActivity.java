@@ -36,30 +36,29 @@ public class GameActivity extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
 
-    private Handler gameHandler = new Handler(Looper.getMainLooper());
 
     private Handler moveHandler = new Handler(Looper.getMainLooper());
     private boolean isMovingLeft = false;
     private boolean isMovingRight = false;
 
     private Handler mapHandler = new Handler(Looper.getMainLooper());
-    //    private Handler movementHandler = new Handler(Looper.getMainLooper());
+
     private List<MapModel> mapModels = new ArrayList<>();
     private List<MapView> mapViews = new ArrayList<>();
 
-    //    private Handler itemHandler = new Handler(Looper.getMainLooper());
-//    private Handler itemMovementHandler = new Handler(Looper.getMainLooper());
+
     private List<ItemModel> itemModels = new ArrayList<>();
     private List<ItemView> itemViews = new ArrayList<>();
-    private GroundMonsterModel groundMonsterModel;
-    private GroundMonsterView groundMonsterView;
+    private List<MonsterModel> monsterModels = new ArrayList<>();
+    private List<MonsterView> monsterViews = new ArrayList<>();
+    private int monsterSpawnInterval = 300; // 몬스터 생성 간격 (프레임 단위)
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // XML 레이아웃 설정
+        // 기존 코드 유지
         setContentView(R.layout.activity_game);
 
         // 화면 크기 가져오기
@@ -79,64 +78,26 @@ public class GameActivity extends AppCompatActivity {
         btnPause = findViewById(R.id.btnPause);
         btnAttack = findViewById(R.id.btnAttack);
 
-        // 키보드 입력 감지 설정
         View mainView = findViewById(android.R.id.content);
         mainView.setFocusableInTouchMode(true);
         mainView.requestFocus();
         mainView.setOnKeyListener(this::handleKeyboardInput);
 
 
-        // 플레이어와 몬스터 맵 모델 생성d
-
+        // 플레이어 초기화
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 400, screenWidth, screenHeight);
-        monsterModel = new MonsterModel(screenWidth / 4f, screenHeight / 4f, 0, 1);
-
-        // 플레이어와 몬스터 맵 뷰 생성
         playerView = new PlayerView(this, playerModel);
-        monsterView = new MonsterView(this, monsterModel);
-        //roundMonsterView= new MonsterView(this, groundMonsterModel);
-
-
-        // groundView 높이 계산 및 땅 몬스터 초기화
-        groundView.post(() -> {
-            int groundHeight = groundView.getHeight() + 150;
-            setupGroundMonster(groundHeight);
-        });
-
-//        // 게임 루프 시작은 setupGroundMonster가 호출된 이후 실행되도록 보장 / 미정
-//        new Handler(Looper.getMainLooper()).postDelayed(() -> startGameLoop(), 100);
-
-        // Pause 버튼 클릭 이벤트 설정
-        btnPause.setOnClickListener(v -> pauseGame());
-
-        // 게임 화면에 뷰 추가
-        gameView.addView(monsterView);
         gameView.addView(playerView);
 
-        // 버튼 동작 설정
+
         setupButtonListeners();
 
         StateManager.setCurrentState(StateManager.GameState.RUNNING);
-
-
-
         // 게임 루프 시작
         startGameLoop();
     }
 
 
-    private void setupGroundMonster(int groundHeight) {
-        // 땅 몬스터의 초기 X 위치를 동적으로 설정
-        float startX = screenWidth;
-        float speedX = 1; // 이동 속도
-        groundMonsterModel = new GroundMonsterModel(startX, screenHeight - groundHeight, speedX);
-
-        // 땅 몬스터 뷰 생성
-        groundMonsterView = new GroundMonsterView(this, groundMonsterModel);
-
-        // 게임 뷰에 추가
-        gameView.addView(groundMonsterView);
-    }
 
     private void setupButtonListeners() {
         // 좌우 이동 버튼 터치 이벤트 설정
@@ -145,6 +106,8 @@ public class GameActivity extends AppCompatActivity {
 
         // 점프 버튼 클릭 이벤트 설정
         btnJump.setOnClickListener(v -> playerModel.jump());
+
+        btnPause.setOnClickListener(v -> pauseGame());
 
         //공격 버튼 클릭 이벤트 설정
         btnAttack.setOnClickListener(v -> attackMonsters());
@@ -206,6 +169,7 @@ public class GameActivity extends AppCompatActivity {
             int frameCounter = 0;
             int newMapCounter = 120;
             int newItemCounter = 120;
+            int monsterSpawnInterval = 300; // 몬스터 생성 간격 (프레임 단위)
 
             while (playerModel.isAlive()) {
                 // 현재 상태를 확인
@@ -230,37 +194,45 @@ public class GameActivity extends AppCompatActivity {
                     runOnUiThread(this::startItemGeneration);
                 }
 
+                // 몬스터 생성
+                if (frameCounter % monsterSpawnInterval == 0) {
+                    runOnUiThread(this::spawnMonster);
+                }
+
                 runOnUiThread(() -> {
                     // 모델 업데이트
                     playerModel.updatePosition();
-                    monsterModel.updatePosition();
+
+                    // 모든 몬스터 업데이트
+                    for (int i = monsterModels.size() - 1; i >= 0; i--) {
+                        MonsterModel monster = monsterModels.get(i);
+                        monster.updatePosition();
+
+                        // 화면 밖으로 나간 몬스터 제거
+                        if (monster.getX() + 100 < 0) {
+                            gameView.removeView(monsterViews.get(i));
+                            monsterModels.remove(i);
+                            monsterViews.remove(i);
+                        }
+                    }
 
                     startMapMovement();
                     startItemMovement();
 
-                    // 충돌 체크
+                    // 아이템 충돌 체크
                     checkItemCollision();
 
                     // 몬스터 충돌 체크
-                    if (monsterModel != null && playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
-                        playerModel.setAlive(false);
-                        endGame();
-                    }
-
-                    // 땅 몬스터 충돌 체크
-                    if (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY())) {
-                        playerModel.setAlive(false);
-                        endGame();
-                    }
+                    checkMonsterCollision();
 
                     // 점수 증가
                     playerModel.increaseScore(1);
 
                     // 화면 갱신
                     playerView.invalidate();
-                    monsterView.invalidate();
-                    if (groundMonsterView != null) {
-                        groundMonsterView.invalidate();
+
+                    for (MonsterView monsterView : monsterViews) {
+                        monsterView.invalidate();
                     }
                 });
 
@@ -272,6 +244,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }).start();
     }
+
 
 
     private void pauseGame() {
@@ -442,7 +415,6 @@ public class GameActivity extends AppCompatActivity {
 
                 restorePlayerEffectAfterDelay(item.getType());
 
-
                 //gameView.removeView(itemViews.get(i));
                 int finalI = i;
                 runOnUiThread(() -> {
@@ -457,6 +429,32 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void spawnMonster() {
+        Random random = new Random();
+        float spawnX = screenWidth;
+        float spawnY = random.nextInt(screenHeight / 2) + screenHeight / 4f;
+        MonsterModel newMonster = new MonsterModel(spawnX, spawnY, 1, 1);
+        MonsterView newMonsterView = new MonsterView(this, newMonster);
+
+        monsterModels.add(newMonster);
+        monsterViews.add(newMonsterView);
+        gameView.addView(newMonsterView);
+    }
+
+    private void checkMonsterCollision() {
+        for (int i = monsterModels.size() - 1; i >= 0; i--) {
+            MonsterModel monster = monsterModels.get(i);
+
+            if (playerModel.checkCollision(monster.getX(), monster.getY())) {
+                playerModel.setAlive(false);
+                endGame();
+                break;
+            }
+        }
+    }
+
+
     private void restorePlayerEffectAfterDelay(ItemModel.ItemType type) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             switch (type) {
@@ -479,23 +477,20 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void attackMonsters() {
-        // 공중 몬스터 제거
-        for (int i = 0; i < mapModels.size(); i++) {
-            MonsterModel monster = monsterModel;
-            if (playerModel.isInAttackRange(monster.getX(), monster.getY())) {
-                gameView.removeView(monsterView);
-                mapModels.remove(i);
-                i--; // 리스트 크기 보정
+        for (int i = monsterModels.size() - 1; i >= 0; i--) {
+            MonsterModel monster = monsterModels.get(i);
+
+            // 플레이어의 공격 범위 내에 있는지 확인
+            if (monster.isActive() && playerModel.isInAttackRange(monster.getX(), monster.getY())) {
+                monster.deactivate(); // 몬스터 비활성화
+                int finalI = i; // 람다 표현식에서 사용할 인덱스
+
+                runOnUiThread(() -> gameView.removeView(monsterViews.get(finalI))); // 뷰에서 제거
+
+                monsterModels.remove(i); // 모델 리스트에서 제거
+                monsterViews.remove(i); // 뷰 리스트에서 제거
             }
         }
-
-        // 땅 몬스터 제거
-        if (groundMonsterModel != null && playerModel.isInAttackRange(groundMonsterModel.getX(), groundMonsterModel.getY())) {
-            gameView.removeView(groundMonsterView);
-            groundMonsterModel = null;
-        }
     }
-
-
 
 }
