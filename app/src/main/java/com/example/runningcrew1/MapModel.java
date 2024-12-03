@@ -3,12 +3,11 @@ package com.example.runningcrew1;
 
 public class MapModel {
 
-    private int displayWidth =0 ;
+    private int displayWidth =0;
     private int displayHeight =0;
 
     private int terrainX;
     private int terrainY;
-    private int width;
 
 
     public MapModel(int displayWidth, int randNum){
@@ -17,7 +16,6 @@ public class MapModel {
 
         this.terrainX = displayWidth-600;
         this.terrainY = randNum;
-        this.width = width;
     }
 
     public void updatePosition(){
@@ -31,9 +29,5 @@ public class MapModel {
     }
     public int getTerrainY(){
         return this.terrainY;
-    }
-
-    public int getWidth() {
-        return width;
     }
 }

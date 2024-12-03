@@ -39,13 +39,13 @@ public class PlayerModel {
     }
 
     public void moveLeft() {
-        x -= speed *2;
+        x -= speed;
         if (x < 0) x = 0;
         Log.d("PlayerPosition", "Moved Left: X = " + x + ", Y = " + y);
     }
 
     public void moveRight() {
-        x += speed *2;
+        x += speed;
         if (x > screenWidth) x = screenWidth;
         Log.d("PlayerPosition", "Moved Right: X = " + x + ", Y = " + y);
 

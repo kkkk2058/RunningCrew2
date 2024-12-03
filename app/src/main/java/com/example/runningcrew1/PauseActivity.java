@@ -31,11 +31,12 @@ public class PauseActivity extends AppCompatActivity {
             finish(); // PauseActivity 종료
         });
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        StateManager.setCurrentState(StateManager.GameState.PAUSED);
-    }
 }
+
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+////        StateManager.setCurrentState(StateManager.GameState.PAUSED);
+//    }
+//}
 
