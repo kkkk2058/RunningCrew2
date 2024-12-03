@@ -156,7 +156,7 @@ public class GameActivity extends AppCompatActivity {
             case KeyEvent.ACTION_DOWN:
                 // 연속 이동 동작 시작
                 if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_A) {
-                    if (!isMovingLeft) { // 이미 이동 중이 아니면 시작
+                    if (!isMovingLeft) { // 이미 이동 중이 아니면 kkd시작
                         isMovingLeft = true;
                         startContinuousMove(true);
                     }
@@ -238,11 +238,11 @@ public class GameActivity extends AppCompatActivity {
 
                     checkItemCollision();
 
-                    // 충돌 체크
-                    if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
-                        playerModel.setAlive(false);
-                        endGame();
-                    }
+//                    // 충돌 체크
+//                    if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
+//                        playerModel.setAlive(false);
+//                        endGame();
+//                    }
 
                     // 점수 증가 로직
                     playerModel.increaseScore(1);
@@ -263,17 +263,16 @@ public class GameActivity extends AppCompatActivity {
                         }
 
                         // 충돌 체크 및 점수 업데이트
-                        if ((playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) ||
-                                (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY()))) {
+                        if (monsterModel != null && playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
                             playerModel.setAlive(false);
                             endGame();
                         }
 
-                        // 땅 몬스터와의 충돌 체크
                         if (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY())) {
                             playerModel.setAlive(false);
                             endGame();
                         }
+
 
                         playerModel.increaseScore(1);
 
@@ -520,6 +519,7 @@ public class GameActivity extends AppCompatActivity {
             groundMonsterModel = null;
         }
     }
+
 
 
 }

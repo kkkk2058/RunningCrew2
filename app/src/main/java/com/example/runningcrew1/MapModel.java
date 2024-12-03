@@ -8,6 +8,7 @@ public class MapModel {
 
     private int terrainX;
     private int terrainY;
+    private int width;
 
 
     public MapModel(int displayWidth, int randNum){
@@ -16,6 +17,7 @@ public class MapModel {
 
         this.terrainX = displayWidth-100;
         this.terrainY = randNum;
+        this.width = width;
     }
 
     public void updatePosition(){
@@ -29,5 +31,9 @@ public class MapModel {
     }
     public int getTerrainY(){
         return this.terrainY;
+    }
+
+    public int getWidth() {
+        return width;
     }
 }

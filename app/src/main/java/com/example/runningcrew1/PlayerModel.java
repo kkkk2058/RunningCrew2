@@ -37,12 +37,12 @@ public class PlayerModel {
     }
 
     public void moveLeft() {
-        x -= speed;
+        x -= speed *2;
         if (x < 0) x = 0;
     }
 
     public void moveRight() {
-        x += speed;
+        x += speed *2;
         if (x > screenWidth) x = screenWidth;
     }
 
