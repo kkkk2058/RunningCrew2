@@ -37,19 +37,18 @@ public class GameActivity extends AppCompatActivity {
     private int screenHeight;
 
     private Handler gameHandler = new Handler(Looper.getMainLooper());
-    private boolean isGamePaused = false;
 
     private Handler moveHandler = new Handler(Looper.getMainLooper());
     private boolean isMovingLeft = false;
     private boolean isMovingRight = false;
 
     private Handler mapHandler = new Handler(Looper.getMainLooper());
-    private Handler movementHandler = new Handler(Looper.getMainLooper());
+    //    private Handler movementHandler = new Handler(Looper.getMainLooper());
     private List<MapModel> mapModels = new ArrayList<>();
     private List<MapView> mapViews = new ArrayList<>();
 
-    private Handler itemHandler = new Handler(Looper.getMainLooper());
-    private Handler itemMovementHandler = new Handler(Looper.getMainLooper());
+    //    private Handler itemHandler = new Handler(Looper.getMainLooper());
+//    private Handler itemMovementHandler = new Handler(Looper.getMainLooper());
     private List<ItemModel> itemModels = new ArrayList<>();
     private List<ItemView> itemViews = new ArrayList<>();
     private GroundMonsterModel groundMonsterModel;
@@ -117,6 +116,9 @@ public class GameActivity extends AppCompatActivity {
         // 버튼 동작 설정
         setupButtonListeners();
 
+        StateManager.setCurrentState(StateManager.GameState.RUNNING);
+
+
 
         // 게임 루프 시작
         startGameLoop();
@@ -149,14 +151,14 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private boolean handleKeyboardInput(View v, int keyCode, KeyEvent event) {
-        if (isGamePaused) return false; // 일시정지 상태에서는 무시
+        if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return false;
 
         // 키 입력 이벤트 처리
         switch (event.getAction()) {
             case KeyEvent.ACTION_DOWN:
                 // 연속 이동 동작 시작
                 if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_A) {
-                    if (!isMovingLeft) { // 이미 이동 중이 아니면 시작
+                    if (!isMovingLeft) { // 이미 이동 중이 아니면 kkd시작
                         isMovingLeft = true;
                         startContinuousMove(true);
                     }
@@ -206,10 +208,10 @@ public class GameActivity extends AppCompatActivity {
             int newItemCounter = 120;
 
             while (playerModel.isAlive()) {
-                // pause 상태일 때 루프를 멈춤
-                if (isGamePaused) {
+                // 현재 상태를 확인
+                if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) {
                     try {
-                        Thread.sleep(100); // pause 상태에서 루프를 잠시 멈춤
+                        Thread.sleep(100); // RUNNING 상태가 아닐 경우 대기
                         continue;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -218,10 +220,12 @@ public class GameActivity extends AppCompatActivity {
 
                 frameCounter++;
 
+                // 맵 생성
                 if (frameCounter % newMapCounter == 0) {
                     runOnUiThread(this::startMapGeneration);
                 }
 
+                // 아이템 생성
                 if (frameCounter % newItemCounter == 0) {
                     runOnUiThread(this::startItemGeneration);
                 }
@@ -234,54 +238,31 @@ public class GameActivity extends AppCompatActivity {
                     startMapMovement();
                     startItemMovement();
 
+                    // 충돌 체크
                     checkItemCollision();
 
-                    // 충돌 체크
-                    if (playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
+                    // 몬스터 충돌 체크
+                    if (monsterModel != null && playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) {
                         playerModel.setAlive(false);
                         endGame();
                     }
 
-                    // 점수 증가 로직
+                    // 땅 몬스터 충돌 체크
+                    if (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY())) {
+                        playerModel.setAlive(false);
+                        endGame();
+                    }
+
+                    // 점수 증가
                     playerModel.increaseScore(1);
 
+                    // 화면 갱신
                     playerView.invalidate();
+                    monsterView.invalidate();
+                    if (groundMonsterView != null) {
+                        groundMonsterView.invalidate();
+                    }
                 });
-
-                if (!isGamePaused) {
-                    runOnUiThread(() -> {
-                        // 기존 모델 업데이트
-                        playerModel.updatePosition();
-                        monsterModel.updatePosition();
-
-                        // 땅 몬스터 업데이트
-                        if (groundMonsterModel != null) {
-                            groundMonsterModel.updatePosition();
-                        }
-
-                        // 충돌 체크 및 점수 업데이트
-                        if ((playerModel.checkCollision(monsterModel.getX(), monsterModel.getY())) ||
-                                (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY()))) {
-                            playerModel.setAlive(false);
-                            endGame();
-                        }
-
-                        // 땅 몬스터와의 충돌 체크
-                        if (groundMonsterModel != null && playerModel.checkCollision(groundMonsterModel.getX(), groundMonsterModel.getY())) {
-                            playerModel.setAlive(false);
-                            endGame();
-                        }
-
-                        playerModel.increaseScore(1);
-
-                        // 화면 갱신
-                        playerView.invalidate();
-                        monsterView.invalidate();
-                        if (groundMonsterView != null) {
-                            groundMonsterView.invalidate();
-                        }
-                    });
-                }
 
                 try {
                     Thread.sleep(32); // 약 60FPS
@@ -293,14 +274,19 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-
     private void pauseGame() {
-        isGamePaused = true; // 게임 중지
+        // 게임 상태를 PAUSED로 변경
+        StateManager.setCurrentState(StateManager.GameState.PAUSED);
+
         Intent intent = new Intent(GameActivity.this, PauseActivity.class);
         startActivity(intent);
     }
 
+
     private void endGame() {
+        // 게임 상태를 GAME_OVER로 변경
+        StateManager.setCurrentState(StateManager.GameState.GAME_OVER);
+
         Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
         intent.putExtra("score", playerModel.getScore());
         startActivity(intent);
@@ -311,18 +297,12 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        isGamePaused = false; // 게임 재개
+        StateManager.setCurrentState(StateManager.GameState.RUNNING); // 상태를 RUNNING으로 설정
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        isGamePaused = true; // 게임 중지
-    }
+
 
     private boolean handleMove(MotionEvent event, boolean isLeft) {
-        if (isGamePaused) return false; // 일시정지 상태에서는 무시
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (isLeft) {
@@ -345,11 +325,12 @@ public class GameActivity extends AppCompatActivity {
         return true;
     }
 
+
     private void startContinuousMove(boolean isLeft) {
         moveHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isGamePaused) return; // 게임이 멈춘 상태에서는 동작 무시
+                if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
                 if (isLeft && isMovingLeft) {
                     playerModel.moveLeft();
@@ -364,7 +345,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void startMapGeneration() {
 
-        if (isGamePaused) return;
+        if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
         if (!playerModel.isAlive())
             return;
@@ -386,8 +367,8 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startMapMovement() {
-
-        if (isGamePaused) return;
+        // RUNNING 상태가 아니라면 맵 움직임 중지
+        if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
         for (int i = mapModels.size() - 1; i >= 0; i--) {
             MapModel mapModel = mapModels.get(i);
@@ -399,17 +380,16 @@ public class GameActivity extends AppCompatActivity {
                 gameView.removeView(mapViews.get(i));
                 mapViews.remove(i);
             } else {
-               mapViews.get(i).setX(mapModel.getTerrainX());
-
+                mapViews.get(i).setX(mapModel.getTerrainX());
             }
-            //mapViews.get(i).setX(mapModel.getTerrainX());
         }
     }
+
 
     private void startItemGeneration() {
 
         Log.d("GameActivity", "아이템 생성 호출됨 ");
-        if (isGamePaused) return;
+        if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
         if (!playerModel.isAlive())
             return;
@@ -432,9 +412,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startItemMovement() {
-        if (isGamePaused) return;
-        // 모든 아이템을 왼쪽으로 이동
-      
+        // RUNNING 상태가 아니라면 아이템 움직임 중지
+        if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
+
         for (int i = itemModels.size() - 1; i >= 0; i--) {
             ItemModel itemModel = itemModels.get(i);
             itemModel.updatePosition();
@@ -449,8 +429,8 @@ public class GameActivity extends AppCompatActivity {
                 itemView.invalidate();
             }
         }
-
     }
+
 
     private void checkItemCollision() {
         for (int i = 0; i < itemModels.size(); i++) {
@@ -515,6 +495,7 @@ public class GameActivity extends AppCompatActivity {
             groundMonsterModel = null;
         }
     }
+
 
 
 }
