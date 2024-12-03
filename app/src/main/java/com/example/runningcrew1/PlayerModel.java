@@ -1,6 +1,8 @@
 
 package com.example.runningcrew1;
 
+import android.util.Log;
+
 public class PlayerModel {
     private float x, y; // 플레이어 위치
     private float speed; // 플레이어 이동 속도
@@ -39,11 +41,14 @@ public class PlayerModel {
     public void moveLeft() {
         x -= speed *2;
         if (x < 0) x = 0;
+        Log.d("PlayerPosition", "Moved Left: X = " + x + ", Y = " + y);
     }
 
     public void moveRight() {
         x += speed *2;
         if (x > screenWidth) x = screenWidth;
+        Log.d("PlayerPosition", "Moved Right: X = " + x + ", Y = " + y);
+
     }
 
     public void jump() {
@@ -116,37 +121,26 @@ public class PlayerModel {
         float distance = (float) Math.sqrt(Math.pow(x - monsterX, 2) + Math.pow(y - monsterY, 2));
         return distance < 100; // 임의로 100을 충돌 거리로 설정
     }
-
-
-    // 아이템 효과 적용
     public void applyEffect(ItemModel.ItemType type) {
         switch (type) {
             case GROW:
-                //this.size *= 2; // 크기 증가
                 this.playerHeight *= 2;
                 this.playerWidth *= 2;
                 break;
             case SHRINK:
-                //this.size *= 0.5; // 크기 감소
                 this.playerHeight *= 0.5;
                 this.playerWidth *= 0.5;
                 break;
             case SPEEDUP:
-                this.speed *= 1.5; // 속도 증가
+                this.speed *= 1.5;
                 break;
         }
     }
-
-    // 효과 초기화 (예: 5초 후)
-    public void resetEffect() {
-        this.size = 1; // 기본 크기
-        this.speed = 5;   // 기본 속도
-    }
-
-    // Getter 및 충돌 체크
     public boolean checkItemCollision(float itemX, float itemY) {
-        return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
-                this.y < itemY + 50 && this.y + this.playerHeight > itemY;
+        //return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
+        //        this.y < itemY + 50 && this.y + this.playerHeight > itemY;
+        float distance = (float) Math.sqrt(Math.pow(x - itemX, 2) + Math.pow(y - itemY, 2));
+        return distance < 100; // 임의로 100을 충돌 거리로 설정
     }
 
     public float getAttackRange() {
