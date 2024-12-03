@@ -3,7 +3,7 @@ package com.example.runningcrew1;
 
 public class MapModel {
 
-    private int displayWidth =0;
+    private int displayWidth =0 ;
     private int displayHeight =0;
 
     private int terrainX;
