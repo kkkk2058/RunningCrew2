@@ -110,7 +110,10 @@ public class GameActivity extends AppCompatActivity {
         btnPause.setOnClickListener(v -> pauseGame());
 
         //공격 버튼 클릭 이벤트 설정
-        btnAttack.setOnClickListener(v -> attackMonsters());
+        btnAttack.setOnClickListener(v -> {
+            attackMonsters();
+            playerModel.startAttack();
+        });
     }
 
     private boolean handleKeyboardInput(View v, int keyCode, KeyEvent event) {
@@ -201,6 +204,7 @@ public class GameActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     // 모델 업데이트
+                    playerModel.updateAttackState();
                     playerModel.updatePosition();
 
                     // 모든 몬스터 업데이트
