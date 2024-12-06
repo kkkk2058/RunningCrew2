@@ -14,6 +14,9 @@ public class PlayerModel {
     private static final float GRAVITY = 2.5f; // 중력 가속도
     private static final float TOP_LIMIT = 100; // 화면 상단의 제한 (100px 여유)
     private final float attackRange = 200f; // 공격 범위 설정
+    private boolean isAttacking; // 공격 상태
+    private long attackStartTime; // 공격 시작 시간
+    private static final long ATTACK_DURATION = 500; // 공격 지속 시간 (ms)
 
     private float size = 1;
     private int playerWidth = 200;
@@ -150,5 +153,20 @@ public class PlayerModel {
     public boolean isInAttackRange(float monsterX, float monsterY) {
         float distance = (float) Math.sqrt(Math.pow(monsterX - x, 2) + Math.pow(monsterY - y, 2));
         return distance <= attackRange;
+    }
+
+    public void startAttack() {
+        isAttacking = true;
+        attackStartTime = System.currentTimeMillis();
+    }
+
+    public void updateAttackState() {
+        if (isAttacking && System.currentTimeMillis() - attackStartTime > ATTACK_DURATION) {
+            isAttacking = false;
+        }
+    }
+
+    public boolean isAttacking() {
+        return isAttacking;
     }
 }
