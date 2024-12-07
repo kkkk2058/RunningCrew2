@@ -8,7 +8,7 @@ import android.view.View;
 
 public class ItemView extends View {
     private ItemModel itemModel;
-    private Bitmap mapBitmap;
+    private Bitmap itemBitmap;
 
     public ItemView(Context context, ItemModel model) {
         super(context);
@@ -18,18 +18,21 @@ public class ItemView extends View {
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.itembox);
         int desiredWidth = 200;
         int desiredHeight = 200;
-        this.mapBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
+        this.itemBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mapBitmap != null) {
-            float x = itemModel.getItemX() - (mapBitmap.getWidth() / 2);
-            float y = itemModel.getItemY() - (mapBitmap.getHeight() / 2);
-            canvas.drawBitmap(mapBitmap, x, y, null);
+        if (itemBitmap != null) {
+            float x = itemModel.getItemX() - (itemBitmap.getWidth() / 2);
+            //float x = itemModel.getItemX();
+            float y = itemModel.getItemY() - (itemBitmap.getHeight() / 2);
+            //float y = itemModel.getItemY();
+            canvas.drawBitmap(itemBitmap, x, y, null);
         }
+        invalidate();
     }
 
     public void updateView() {

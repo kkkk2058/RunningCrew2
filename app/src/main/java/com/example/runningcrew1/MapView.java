@@ -35,6 +35,7 @@ public class MapView extends View {
                 canvas.drawBitmap(mapBitmap, x, y, null);
             }
         }
+        invalidate();
     }
     public void updateView() {
         invalidate();
