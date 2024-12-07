@@ -21,7 +21,7 @@ public class ItemModel {
 
         this.displayWidth = displayWidth;
         this.displayHeight = displayHeight;
-        this.itemX = displayWidth;
+        this.itemX = displayWidth-00; //600
         Random random = new Random();
         this.itemY = random.nextInt(displayHeight - 50);
         this.type = generateRandomType();
@@ -30,7 +30,7 @@ public class ItemModel {
 
     public void updatePosition(){
         this.itemX -= 1;
-//        Log .d("UpdatePosition", "Item updated: X = " + this.itemX);
+        //Log.d("UpdatePosition", "Item updated: X = " + this.itemX);
 
     }
 

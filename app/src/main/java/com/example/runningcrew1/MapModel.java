@@ -14,7 +14,7 @@ public class MapModel {
 
         this.displayWidth = displayWidth;
 
-        this.terrainX = displayWidth-600;
+        this.terrainX = displayWidth;
         this.terrainY = randNum;
     }
 

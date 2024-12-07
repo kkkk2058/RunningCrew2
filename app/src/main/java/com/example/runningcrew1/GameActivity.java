@@ -98,7 +98,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-
     private void setupButtonListeners() {
         // 좌우 이동 버튼 터치 이벤트 설정
         btnLeft.setOnTouchListener((v, event) -> handleMove(event, true));
@@ -171,7 +170,7 @@ public class GameActivity extends AppCompatActivity {
         new Thread(() -> {
             int frameCounter = 0;
             int newMapCounter = 120;
-            int newItemCounter = 120;
+            int newItemCounter = 180;
             int monsterSpawnInterval = 300; // 몬스터 생성 간격 (프레임 단위)
 
             while (playerModel.isAlive()) {
@@ -250,7 +249,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-
     private void pauseGame() {
         // 게임 상태를 PAUSED로 변경
         StateManager.setCurrentState(StateManager.GameState.PAUSED);
@@ -276,7 +274,6 @@ public class GameActivity extends AppCompatActivity {
         super.onResume();
         StateManager.setCurrentState(StateManager.GameState.RUNNING); // 상태를 RUNNING으로 설정
     }
-
 
 
     private boolean handleMove(MotionEvent event, boolean isLeft) {
@@ -356,8 +353,6 @@ public class GameActivity extends AppCompatActivity {
                 mapModels.remove(i);
                 gameView.removeView(mapViews.get(i));
                 mapViews.remove(i);
-            } else {
-                mapViews.get(i).setX(mapModel.getTerrainX());
             }
         }
     }
@@ -389,7 +384,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startItemMovement() {
-        // RUNNING 상태가 아니라면 아이템 움직임 중지
         if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
         for (int i = itemModels.size() - 1; i >= 0; i--) {
@@ -400,35 +394,37 @@ public class GameActivity extends AppCompatActivity {
                 itemModels.remove(i);
                 gameView.removeView(itemViews.get(i));
                 itemViews.remove(i);
-            } else {
-                ItemView itemView = itemViews.get(i);
-                itemView.setX(itemModel.getItemX());
-                itemView.invalidate();
             }
         }
     }
 
 
     private void checkItemCollision() {
-        for (int i = 0; i < itemModels.size(); i++) {
+        for (int i = itemModels.size() - 1; i >= 0; i--) {
             ItemModel item = itemModels.get(i);
 
             if (playerModel.checkItemCollision(item.getItemX(), item.getItemY())) { // 50은 아이템 크기
-                playerModel.applyEffect(item.getType());
-                playerView.updateView();
-
-                restorePlayerEffectAfterDelay(item.getType());
-
-                //gameView.removeView(itemViews.get(i));
                 int finalI = i;
                 runOnUiThread(() -> {
                     gameView.removeView(itemViews.get(finalI));
                 });
+                playerModel.applyEffect(item.getType());
+                if (item.getType() == ItemModel.ItemType.GROW) {
+                    Log.d("item", "Item ");
+
+                    destroyMapCheck();
+                }
+                playerView.updateView();
+
+                restorePlayerEffectAfterDelay(item.getType());
+
                 itemModels.remove(i);
                 itemViews.remove(i);
-                i--;
 
                 Log.d("GameActivity", "아이템 효과 적용됨: " + item.getType());
+                //Log.d("GameActivity", "플레이어좌표: " + playerModel.getX() +"y"+ playerModel.getY());
+                //Log.d("GameActivity", "아이템좌표: " + item.getX() + "y" + item.getY());
+
 
             }
         }
@@ -463,21 +459,20 @@ public class GameActivity extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             switch (type) {
                 case GROW:
-                    playerModel.setPlayerWidth(playerModel.getPlayerWidth()/2);
-                    playerModel.setPlayerHeight(playerModel.getPlayerHeight()/2);
+                    playerModel.setPlayerWidth(playerModel.getPlayerWidth() / 2);
+                    playerModel.setPlayerHeight(playerModel.getPlayerHeight() / 2);
                     break;
                 case SHRINK:
-                    playerModel.setPlayerWidth(playerModel.getPlayerWidth()*2);
-                    playerModel.setPlayerHeight(playerModel.getPlayerHeight()*2);
+                    playerModel.setPlayerWidth(playerModel.getPlayerWidth() * 2);
+                    playerModel.setPlayerHeight(playerModel.getPlayerHeight() * 2);
                     break;
                 case SPEEDUP:
-                    playerModel.setSpeed(playerModel.getPlayerSpeed()/2);
+                    playerModel.setSpeed(playerModel.getPlayerSpeed() / 2);
                     break;
             }
             playerView.updateView();
         }, 3000);
     }
-
 
 
     private void attackMonsters() {
@@ -495,6 +490,49 @@ public class GameActivity extends AppCompatActivity {
                 monsterViews.remove(i); // 뷰 리스트에서 제거
             }
         }
+    }
+
+    private boolean isGrowEffectActive = false;
+
+    private void destroyMapCheck() {
+        isGrowEffectActive = true;
+        // GROW 효과가 끝날 때까지 3초 동안 충돌 체크
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 3초 후, 효과 종료
+                Log.d("GameActivity", "GROW effect ended");
+                isGrowEffectActive = false;
+
+            }
+        }, 3000);
+
+        // 3초 동안 주기적으로 맵과 충돌 체크 실행
+        Handler handler = new Handler(Looper.getMainLooper());
+        Runnable collisionCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // 현재 상태가 RUNNING이고, 플레이어가 살아 있을 때만 충돌 체크
+                if (StateManager.getCurrentState() == StateManager.GameState.RUNNING && playerModel.isAlive()) {
+                    // 플레이어가 커졌을 때 맵과의 충돌 체크
+                    if (isGrowEffectActive) {
+                        for (int j = mapModels.size() - 1; j >= 0; j--) {
+                            MapModel map = mapModels.get(j);
+                            if (playerModel.checkItemCollision(map.getTerrainX(), map.getTerrainY())) {
+                                int finalJ = j;
+                                runOnUiThread(() -> {
+                                    gameView.removeView(mapViews.get(finalJ));
+                                });
+                                mapModels.remove(j);
+                                mapViews.remove(j);
+                            }
+                        }
+                    }
+                }
+                handler.postDelayed(this, 100);
+            }
+        };
+        handler.post(collisionCheckRunnable);
     }
 
 }

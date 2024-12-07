@@ -140,8 +140,6 @@ public class PlayerModel {
         }
     }
     public boolean checkItemCollision(float itemX, float itemY) {
-        //return this.x < itemX + 50 && this.x + this.playerWidth > itemX &&
-        //        this.y < itemY + 50 && this.y + this.playerHeight > itemY;
         float distance = (float) Math.sqrt(Math.pow(x - itemX, 2) + Math.pow(y - itemY, 2));
         return distance < 100; // 임의로 100을 충돌 거리로 설정
     }
