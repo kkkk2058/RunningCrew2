@@ -186,17 +186,14 @@ public class GameActivity extends AppCompatActivity {
 
                 frameCounter++;
 
-                // 맵 생성
                 if (frameCounter % newMapCounter == 0) {
                     runOnUiThread(this::startMapGeneration);
                 }
 
-                // 아이템 생성
                 if (frameCounter % newItemCounter == 0) {
                     runOnUiThread(this::startItemGeneration);
                 }
 
-                // 몬스터 생성
                 if (frameCounter % monsterSpawnInterval == 0) {
                     runOnUiThread(this::spawnMonster);
                 }
@@ -222,7 +219,6 @@ public class GameActivity extends AppCompatActivity {
                     startMapMovement();
                     startItemMovement();
 
-                    // 아이템 충돌 체크
                     checkItemCollision();
 
                     // 몬스터 충돌 체크
@@ -341,7 +337,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startMapMovement() {
-        // RUNNING 상태가 아니라면 맵 움직임 중지
         if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
         for (int i = mapModels.size() - 1; i >= 0; i--) {
@@ -359,7 +354,6 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void startItemGeneration() {
-
         Log.d("GameActivity", "아이템 생성 호출됨 ");
         if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
@@ -376,11 +370,9 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
-
         itemModels.add(newItemModel);
         itemViews.add(newItemView);
         gameView.addView(newItemView);
-
     }
 
     private void startItemMovement() {
@@ -496,7 +488,6 @@ public class GameActivity extends AppCompatActivity {
 
     private void destroyMapCheck() {
         isGrowEffectActive = true;
-        // GROW 효과가 끝날 때까지 3초 동안 충돌 체크
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -507,14 +498,11 @@ public class GameActivity extends AppCompatActivity {
             }
         }, 3000);
 
-        // 3초 동안 주기적으로 맵과 충돌 체크 실행
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable collisionCheckRunnable = new Runnable() {
             @Override
             public void run() {
-                // 현재 상태가 RUNNING이고, 플레이어가 살아 있을 때만 충돌 체크
                 if (StateManager.getCurrentState() == StateManager.GameState.RUNNING && playerModel.isAlive()) {
-                    // 플레이어가 커졌을 때 맵과의 충돌 체크
                     if (isGrowEffectActive) {
                         for (int j = mapModels.size() - 1; j >= 0; j--) {
                             MapModel map = mapModels.get(j);

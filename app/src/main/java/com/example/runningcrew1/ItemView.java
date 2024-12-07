@@ -14,7 +14,6 @@ public class ItemView extends View {
         super(context);
         this.itemModel = model;
 
-
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.itembox);
         int desiredWidth = 200;
         int desiredHeight = 200;
@@ -27,15 +26,9 @@ public class ItemView extends View {
 
         if (itemBitmap != null) {
             float x = itemModel.getItemX() - (itemBitmap.getWidth() / 2);
-            //float x = itemModel.getItemX();
             float y = itemModel.getItemY() - (itemBitmap.getHeight() / 2);
-            //float y = itemModel.getItemY();
             canvas.drawBitmap(itemBitmap, x, y, null);
         }
-        invalidate();
-    }
-
-    public void updateView() {
         invalidate();
     }
 }
