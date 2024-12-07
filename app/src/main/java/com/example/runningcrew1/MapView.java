@@ -37,7 +37,4 @@ public class MapView extends View {
         }
         invalidate();
     }
-    public void updateView() {
-        invalidate();
-    }
 }
