@@ -23,15 +23,15 @@ public class StateManager {
         System.out.println("State changed from " + oldState + " to " + newState);
     }
 
-    public static boolean isRunning() {
-        return currentState == GameState.RUNNING;
-    }
-
-    public static boolean isPaused() {
-        return currentState == GameState.PAUSED;
-    }
-
-    public static boolean isGameOver() {
-        return currentState == GameState.GAME_OVER;
-    }
+//    public static boolean isRunning() {
+//        return currentState == GameState.RUNNING;
+//    }
+//
+//    public static boolean isPaused() {
+//        return currentState == GameState.PAUSED;
+//    }
+//
+//    public static boolean isGameOver() {
+//        return currentState == GameState.GAME_OVER;
+//    }
 }

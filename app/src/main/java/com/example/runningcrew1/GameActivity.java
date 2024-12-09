@@ -23,9 +23,6 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity {
     private PlayerModel playerModel;
     private PlayerView playerView;
-    private MonsterModel monsterModel;
-    private MonsterView monsterView;
-
 
     private FrameLayout gameView;
     private ImageView groundView;
@@ -36,29 +33,25 @@ public class GameActivity extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
 
-
     private Handler moveHandler = new Handler(Looper.getMainLooper());
     private boolean isMovingLeft = false;
     private boolean isMovingRight = false;
 
-    private Handler mapHandler = new Handler(Looper.getMainLooper());
+//    private Handler mapHandler = new Handler(Looper.getMainLooper());
 
     private List<MapModel> mapModels = new ArrayList<>();
     private List<MapView> mapViews = new ArrayList<>();
 
-
     private List<ItemModel> itemModels = new ArrayList<>();
     private List<ItemView> itemViews = new ArrayList<>();
-    private List<MonsterModel> monsterModels = new ArrayList<>();
-    private List<MonsterView> monsterViews = new ArrayList<>();
-    private int monsterSpawnInterval = 300; // 몬스터 생성 간격 (프레임 단위)
 
+    // MonsterController 추가
+    private MonsterController monsterController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 기존 코드 유지
         setContentView(R.layout.activity_game);
 
         // 화면 크기 가져오기
@@ -83,12 +76,13 @@ public class GameActivity extends AppCompatActivity {
         mainView.requestFocus();
         mainView.setOnKeyListener(this::handleKeyboardInput);
 
-
         // 플레이어 초기화
         playerModel = new PlayerModel(screenWidth / 2f, screenHeight - 400, screenWidth, screenHeight);
         playerView = new PlayerView(this, playerModel);
         gameView.addView(playerView);
 
+        // MonsterController 초기화
+        monsterController = new MonsterController(this, gameView, screenWidth, screenHeight);
 
         setupButtonListeners();
 
@@ -96,7 +90,6 @@ public class GameActivity extends AppCompatActivity {
         // 게임 루프 시작
         startGameLoop();
     }
-
 
     private void setupButtonListeners() {
         // 좌우 이동 버튼 터치 이벤트 설정
@@ -108,7 +101,7 @@ public class GameActivity extends AppCompatActivity {
 
         btnPause.setOnClickListener(v -> pauseGame());
 
-        //공격 버튼 클릭 이벤트 설정
+        // 공격 버튼 클릭 이벤트 설정
         btnAttack.setOnClickListener(v -> {
             attackMonsters();
             playerModel.startAttack();
@@ -123,7 +116,7 @@ public class GameActivity extends AppCompatActivity {
             case KeyEvent.ACTION_DOWN:
                 // 연속 이동 동작 시작
                 if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_A) {
-                    if (!isMovingLeft) { // 이미 이동 중이 아니면 kkd시작
+                    if (!isMovingLeft) {
                         isMovingLeft = true;
                         startContinuousMove(true);
                     }
@@ -131,7 +124,7 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_D) {
-                    if (!isMovingRight) { // 이미 이동 중이 아니면 시작
+                    if (!isMovingRight) {
                         isMovingRight = true;
                         startContinuousMove(false);
                     }
@@ -152,19 +145,18 @@ public class GameActivity extends AppCompatActivity {
             case KeyEvent.ACTION_UP:
                 // 연속 이동 동작 중지
                 if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_A) {
-                    isMovingLeft = false; // 이동 중지
+                    isMovingLeft = false;
                     return true;
                 }
 
                 if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == KeyEvent.KEYCODE_D) {
-                    isMovingRight = false; // 이동 중지
+                    isMovingRight = false;
                     return true;
                 }
                 break;
         }
         return false;
     }
-
 
     private void startGameLoop() {
         new Thread(() -> {
@@ -174,6 +166,7 @@ public class GameActivity extends AppCompatActivity {
             int monsterSpawnInterval = 300; // 몬스터 생성 간격 (프레임 단위)
 
             while (playerModel.isAlive()) {
+
                 // 현재 상태를 확인
                 if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) {
                     try {
@@ -186,54 +179,13 @@ public class GameActivity extends AppCompatActivity {
 
                 frameCounter++;
 
-                if (frameCounter % newMapCounter == 0) {
-                    runOnUiThread(this::startMapGeneration);
-                }
+                // UI 업데이트에 필요한 플래그 설정
+                boolean shouldGenerateMap = (frameCounter % newMapCounter == 0);
+                boolean shouldGenerateItem = (frameCounter % newItemCounter == 0);
+                boolean shouldSpawnMonster = (frameCounter % monsterSpawnInterval == 0);
 
-                if (frameCounter % newItemCounter == 0) {
-                    runOnUiThread(this::startItemGeneration);
-                }
-
-                if (frameCounter % monsterSpawnInterval == 0) {
-                    runOnUiThread(this::spawnMonster);
-                }
-
-                runOnUiThread(() -> {
-                    // 모델 업데이트
-                    playerModel.updateAttackState();
-                    playerModel.updatePosition();
-
-                    // 모든 몬스터 업데이트
-                    for (int i = monsterModels.size() - 1; i >= 0; i--) {
-                        MonsterModel monster = monsterModels.get(i);
-                        monster.updatePosition();
-
-                        // 화면 밖으로 나간 몬스터 제거
-                        if (monster.getX() + 100 < 0) {
-                            gameView.removeView(monsterViews.get(i));
-                            monsterModels.remove(i);
-                            monsterViews.remove(i);
-                        }
-                    }
-
-                    startMapMovement();
-                    startItemMovement();
-
-                    checkItemCollision();
-
-                    // 몬스터 충돌 체크
-                    checkMonsterCollision();
-
-                    // 점수 증가
-                    playerModel.increaseScore(1);
-
-                    // 화면 갱신
-                    playerView.invalidate();
-
-                    for (MonsterView monsterView : monsterViews) {
-                        monsterView.invalidate();
-                    }
-                });
+                // UI 작업을 하나의 호출로 통합
+                runOnUiThread(() -> updateUI(shouldSpawnMonster, shouldGenerateMap, shouldGenerateItem));
 
                 try {
                     Thread.sleep(32); // 약 60FPS
@@ -244,6 +196,51 @@ public class GameActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void updateUI(boolean generateMap, boolean generateItem, boolean spawnMonster) {
+        if (generateMap) {
+            startMapGeneration();
+        }
+
+        if (generateItem) {
+            startItemGeneration();
+        }
+
+        if (spawnMonster) {
+            monsterController.spawnMonster();
+        }
+
+        // 모델 업데이트
+        playerModel.updateAttackState();
+        playerModel.updatePosition();
+
+        // 몬스터 업데이트
+        monsterController.updateMonsters();
+        monsterController.handleMonsterCollisions(playerModel);
+        monsterController.invalidateMonsterViews();
+
+        // 맵과 아이템 이동
+        startMapMovement();
+        startItemMovement();
+
+        // 아이템 충돌 체크
+        checkItemCollision();
+
+        // 점수 증가
+        playerModel.increaseScore(1);
+
+        // 화면 갱신
+        playerView.invalidate();
+
+        // 플레이어가 죽었는지 확인
+        if (!playerModel.isAlive()) {
+            endGame();
+        }
+    }
+
+
+
+
+
 
     private void pauseGame() {
         // 게임 상태를 PAUSED로 변경
@@ -252,7 +249,6 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = new Intent(GameActivity.this, PauseActivity.class);
         startActivity(intent);
     }
-
 
     private void endGame() {
         // 게임 상태를 GAME_OVER로 변경
@@ -264,12 +260,22 @@ public class GameActivity extends AppCompatActivity {
         finish();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
-        StateManager.setCurrentState(StateManager.GameState.RUNNING); // 상태를 RUNNING으로 설정
+        StateManager.setCurrentState(StateManager.GameState.RUNNING);
     }
+
+
+
+    private void attackMonsters() {
+        monsterController.attackMonsters(playerModel);
+    }
+
+
+
+
+
 
 
     private boolean handleMove(MotionEvent event, boolean isLeft) {
@@ -313,8 +319,8 @@ public class GameActivity extends AppCompatActivity {
         }, 50);
     }
 
-    private void startMapGeneration() {
 
+    private void startMapGeneration() {
         if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
 
         if (!playerModel.isAlive())
@@ -323,7 +329,6 @@ public class GameActivity extends AppCompatActivity {
         Random random = new Random();
         int randHeight = random.nextInt(screenHeight) + 50;
         int randNum = random.nextInt(5) + 1;
-
 
         MapModel newMapModel = new MapModel(screenWidth, randHeight);
         MapView newMapView = new MapView(GameActivity.this, newMapModel, randNum);
@@ -335,6 +340,7 @@ public class GameActivity extends AppCompatActivity {
 
         gameView.addView(newMapView);
     }
+
 
     private void startMapMovement() {
         if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) return;
@@ -390,7 +396,6 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-
     private void checkItemCollision() {
         for (int i = itemModels.size() - 1; i >= 0; i--) {
             ItemModel item = itemModels.get(i);
@@ -414,75 +419,10 @@ public class GameActivity extends AppCompatActivity {
                 itemViews.remove(i);
 
                 Log.d("GameActivity", "아이템 효과 적용됨: " + item.getType());
-                //Log.d("GameActivity", "플레이어좌표: " + playerModel.getX() +"y"+ playerModel.getY());
-                //Log.d("GameActivity", "아이템좌표: " + item.getX() + "y" + item.getY());
-
-
             }
         }
     }
 
-    private void spawnMonster() {
-        Random random = new Random();
-        float spawnX = screenWidth;
-        float spawnY = random.nextInt(screenHeight / 2) + screenHeight / 4f;
-        MonsterModel newMonster = new MonsterModel(spawnX, spawnY, 1, 1);
-        MonsterView newMonsterView = new MonsterView(this, newMonster);
-
-        monsterModels.add(newMonster);
-        monsterViews.add(newMonsterView);
-        gameView.addView(newMonsterView);
-    }
-
-    private void checkMonsterCollision() {
-        for (int i = monsterModels.size() - 1; i >= 0; i--) {
-            MonsterModel monster = monsterModels.get(i);
-
-            if (playerModel.checkCollision(monster.getX(), monster.getY())) {
-                playerModel.setAlive(false);
-                endGame();
-                break;
-            }
-        }
-    }
-
-
-    private void restorePlayerEffectAfterDelay(ItemModel.ItemType type) {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            switch (type) {
-                case GROW:
-                    playerModel.setPlayerWidth(playerModel.getPlayerWidth() / 2);
-                    playerModel.setPlayerHeight(playerModel.getPlayerHeight() / 2);
-                    break;
-                case SHRINK:
-                    playerModel.setPlayerWidth(playerModel.getPlayerWidth() * 2);
-                    playerModel.setPlayerHeight(playerModel.getPlayerHeight() * 2);
-                    break;
-                case SPEEDUP:
-                    playerModel.setSpeed(playerModel.getPlayerSpeed() / 2);
-                    break;
-            }
-            playerView.updateView();
-        }, 3000);
-    }
-
-
-    private void attackMonsters() {
-        for (int i = monsterModels.size() - 1; i >= 0; i--) {
-            MonsterModel monster = monsterModels.get(i);
-
-            // 플레이어의 공격 범위 내에 있는지 확인
-            if (monster.isActive() && playerModel.isInAttackRange(monster.getX(), monster.getY())) {
-                monster.deactivate(); // 몬스터 비활성화
-                int finalI = i; // 람다 표현식에서 사용할 인덱스
-
-                runOnUiThread(() -> gameView.removeView(monsterViews.get(finalI))); // 뷰에서 제거
-
-                monsterModels.remove(i); // 모델 리스트에서 제거
-                monsterViews.remove(i); // 뷰 리스트에서 제거
-            }
-        }
-    }
 
     private boolean isGrowEffectActive = false;
 
@@ -497,6 +437,7 @@ public class GameActivity extends AppCompatActivity {
 
             }
         }, 3000);
+
 
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable collisionCheckRunnable = new Runnable() {
@@ -523,4 +464,22 @@ public class GameActivity extends AppCompatActivity {
         handler.post(collisionCheckRunnable);
     }
 
+    private void restorePlayerEffectAfterDelay(ItemModel.ItemType type) {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            switch (type) {
+                case GROW:
+                    playerModel.setPlayerWidth(playerModel.getPlayerWidth() / 2);
+                    playerModel.setPlayerHeight(playerModel.getPlayerHeight() / 2);
+                    break;
+                case SHRINK:
+                    playerModel.setPlayerWidth(playerModel.getPlayerWidth() * 2);
+                    playerModel.setPlayerHeight(playerModel.getPlayerHeight() * 2);
+                    break;
+                case SPEEDUP:
+                    playerModel.setSpeed(playerModel.getPlayerSpeed() / 2);
+                    break;
+            }
+            playerView.updateView();
+        }, 3000);
+    }
 }
