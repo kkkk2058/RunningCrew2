@@ -31,6 +31,7 @@ public class MonsterView extends View {
             float y = monsterModel.getY() - (monsterBitmap.getHeight() / 2);
             canvas.drawBitmap(monsterBitmap, x, y, null);
         }
-        invalidate(); // 화면을 지속적으로 갱신하여 몬스터가 움직임
+        invalidate();
     }
 }
+

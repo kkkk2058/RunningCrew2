@@ -25,7 +25,7 @@ public class MonsterModel {
         if (y < 0 || y > 1920) { // 화면 경계 체크 예시
             speedY = -speedY;
         }
-        //Log.d("UpdatePosition", "monster updated: X = " + this.x);
+
 
     }
 
