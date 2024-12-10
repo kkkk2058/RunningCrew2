@@ -244,7 +244,6 @@ public class GameActivity extends AppCompatActivity {
         }).start();
     }
 
-
     private void pauseGame() {
         // 게임 상태를 PAUSED로 변경
         StateManager.setCurrentState(StateManager.GameState.PAUSED);
@@ -252,7 +251,6 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = new Intent(GameActivity.this, PauseActivity.class);
         startActivity(intent);
     }
-
 
     private void endGame() {
         // 게임 상태를 GAME_OVER로 변경
@@ -264,13 +262,11 @@ public class GameActivity extends AppCompatActivity {
         finish();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         StateManager.setCurrentState(StateManager.GameState.RUNNING); // 상태를 RUNNING으로 설정
     }
-
 
     private boolean handleMove(MotionEvent event, boolean isLeft) {
         switch (event.getAction()) {
@@ -294,7 +290,6 @@ public class GameActivity extends AppCompatActivity {
         }
         return true;
     }
-
 
     private void startContinuousMove(boolean isLeft) {
         moveHandler.postDelayed(new Runnable() {
