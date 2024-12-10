@@ -37,15 +37,12 @@ public class GameActivity extends AppCompatActivity {
     private boolean isMovingLeft = false;
     private boolean isMovingRight = false;
 
-//    private Handler mapHandler = new Handler(Looper.getMainLooper());
-
     private List<MapModel> mapModels = new ArrayList<>();
     private List<MapView> mapViews = new ArrayList<>();
 
     private List<ItemModel> itemModels = new ArrayList<>();
     private List<ItemView> itemViews = new ArrayList<>();
 
-    // MonsterController 추가
     private MonsterController monsterController;
 
     @Override
@@ -81,7 +78,7 @@ public class GameActivity extends AppCompatActivity {
         playerView = new PlayerView(this, playerModel);
         gameView.addView(playerView);
 
-        // MonsterController 초기화
+        // 몬스터 초기화
         monsterController = new MonsterController(this, gameView, screenWidth, screenHeight);
 
         setupButtonListeners();
@@ -163,11 +160,11 @@ public class GameActivity extends AppCompatActivity {
             int frameCounter = 0;
             int newMapCounter = 120;
             int newItemCounter = 180;
-            int monsterSpawnInterval = 300; // 몬스터 생성 간격 (프레임 단위)
+            int monsterSpawnInterval = 300; // 몬스터 생성 간격
 
             while (playerModel.isAlive()) {
 
-                // 현재 상태를 확인
+
                 if (StateManager.getCurrentState() != StateManager.GameState.RUNNING) {
                     try {
                         Thread.sleep(100); // RUNNING 상태가 아닐 경우 대기
@@ -179,12 +176,11 @@ public class GameActivity extends AppCompatActivity {
 
                 frameCounter++;
 
-                // UI 업데이트에 필요한 플래그 설정
                 boolean shouldGenerateMap = (frameCounter % newMapCounter == 0);
                 boolean shouldGenerateItem = (frameCounter % newItemCounter == 0);
                 boolean shouldSpawnMonster = (frameCounter % monsterSpawnInterval == 0);
 
-                // UI 작업을 하나의 호출로 통합
+                // UI 작업 통합
                 runOnUiThread(() -> updateUI(shouldSpawnMonster, shouldGenerateMap, shouldGenerateItem));
 
                 try {
@@ -240,8 +236,6 @@ public class GameActivity extends AppCompatActivity {
 
 
 
-
-
     private void pauseGame() {
         // 게임 상태를 PAUSED로 변경
         StateManager.setCurrentState(StateManager.GameState.PAUSED);
@@ -267,12 +261,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-
     private void attackMonsters() {
         monsterController.attackMonsters(playerModel);
     }
-
-
 
 
 
@@ -463,6 +454,7 @@ public class GameActivity extends AppCompatActivity {
         };
         handler.post(collisionCheckRunnable);
     }
+
 
     private void restorePlayerEffectAfterDelay(ItemModel.ItemType type) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {

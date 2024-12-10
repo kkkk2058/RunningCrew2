@@ -6,6 +6,9 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+// 김세훈 (20201788)
+
 public class PauseActivity extends AppCompatActivity {
 
     @Override
@@ -33,10 +36,5 @@ public class PauseActivity extends AppCompatActivity {
     }
 }
 
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-////        StateManager.setCurrentState(StateManager.GameState.PAUSED);
-//    }
-//}
+
 
