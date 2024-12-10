@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// 김세훈 (20201788)
+
 public class MonsterController {
     private Context context;
     private FrameLayout gameView;
@@ -16,6 +18,7 @@ public class MonsterController {
     private List<MonsterView> monsterViews = new ArrayList<>();
 
     private int screenWidth, screenHeight;
+
 
     public MonsterController(Context context, FrameLayout gameView, int screenWidth, int screenHeight) {
         this.context = context;
@@ -41,7 +44,6 @@ public class MonsterController {
             MonsterModel monster = monsterModels.get(i);
             monster.updatePosition();
 
-            // 몬스터가 화면 밖으로 나간 경우 삭제
             if (monster.getX() + 100 < 0) {
                 gameView.removeView(monsterViews.get(i));
                 monsterModels.remove(i);

@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+// 김세훈 (20201788)
 public class GameOverActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,19 +19,19 @@ public class GameOverActivity extends AppCompatActivity {
         // 점수 가져오기
         int score = getIntent().getIntExtra("score", 0);
 
-        // 점수 표시
         TextView scoreText = findViewById(R.id.scoreText);
         scoreText.setText("점수: " + score);
 
         // 시작 화면으로 돌아가는 버튼
         Button btnReturnToMenu = findViewById(R.id.btnReturnToMenu);
+
         btnReturnToMenu.setOnClickListener(v -> {
             // 상태를 READY로 설정
             StateManager.setCurrentState(StateManager.GameState.READY);
 
             Intent intent = new Intent(GameOverActivity.this, MainMenuActivity.class);
             startActivity(intent);
-            finish(); // GameOverActivity 종료
+            finish();
         });
     }
 }
