@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+// 김세훈 (20201788)
 public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +23,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if (StateManager.getCurrentState() == StateManager.GameState.READY) {
                 Intent intent = new Intent(MainMenuActivity.this, GameActivity.class);
                 intent.putExtra("mode", "echo");
-                StateManager.setCurrentState(StateManager.GameState.RUNNING); // 게임 실행 상태로 변경
+                StateManager.setCurrentState(StateManager.GameState.RUNNING); // RUNNING 상태로 변경
                 startActivity(intent);
             }
         });
@@ -33,7 +33,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if (StateManager.getCurrentState() == StateManager.GameState.READY) {
                 Intent intent = new Intent(MainMenuActivity.this, GameActivity.class);
                 intent.putExtra("mode", "battle");
-                StateManager.setCurrentState(StateManager.GameState.RUNNING); // 게임 실행 상태로 변경
+                StateManager.setCurrentState(StateManager.GameState.RUNNING); // RUNNING 상태로 변경
                 startActivity(intent);
             }
         });

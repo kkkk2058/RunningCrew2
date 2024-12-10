@@ -1,8 +1,10 @@
 package com.example.runningcrew1;
 
+// 김세훈 (20201788)
+
 public class MonsterModel {
-    private float x, y;  // 몬스터의 위치
-    private float speedX, speedY;  // 몬스터의 속도
+    private float x, y;  // 몬스터 위치
+    private float speedX, speedY;  // 몬스터 속도
     private boolean isActive;  // 몬스터 활성화 여부
 
     public MonsterModel(float startX, float startY, float speedX, float speedY) {
@@ -19,13 +21,13 @@ public class MonsterModel {
         x += speedX;
         y += speedY;
 
-        if (x < 0 || x > 1080) { // 화면 경계 체크 예시
+        if (x < 0 || x > 1080) {
             speedX = -speedX;
         }
-        if (y < 0 || y > 1920) { // 화면 경계 체크 예시
+        if (y < 0 || y > 1920) {
             speedY = -speedY;
         }
-        //Log.d("UpdatePosition", "monster updated: X = " + this.x);
+
 
     }
 

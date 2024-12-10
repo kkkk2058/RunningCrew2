@@ -17,7 +17,7 @@ public class MapView extends View {
         this.randNum = randNum;
 
 
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grass);
+        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.cloud);
         int desiredWidth = 100;
         int desiredHeight = 100;
         this.mapBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);

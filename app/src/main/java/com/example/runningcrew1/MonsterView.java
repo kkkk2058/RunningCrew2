@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.view.View;
 
+
+// 김세훈 (20201788)
+
 public class MonsterView extends View {
     private MonsterModel monsterModel;
     private Bitmap monsterBitmap;
@@ -16,8 +19,8 @@ public class MonsterView extends View {
 
 
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.monster);
-        int desiredWidth = 200; // 원하는 너비
-        int desiredHeight = 200; // 원하는 높이
+        int desiredWidth = 200; // 몬스터 너비
+        int desiredHeight = 200; // 몬스터 높이
         this.monsterBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
     }
 
@@ -31,6 +34,7 @@ public class MonsterView extends View {
             float y = monsterModel.getY() - (monsterBitmap.getHeight() / 2);
             canvas.drawBitmap(monsterBitmap, x, y, null);
         }
-        invalidate(); // 화면을 지속적으로 갱신하여 몬스터가 움직임
+        invalidate();
     }
 }
+
